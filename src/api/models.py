@@ -15,6 +15,7 @@ class User(db.Model):
     email: Mapped[str] = mapped_column(String(120), nullable=False, unique=True)
     password_hash: Mapped[str] = mapped_column(String(255), nullable=False)
     trips: Mapped[List["Trip"]] = relationship(back_populates="user")
+    favorites: Mapped[List["Favorite"]] = relationship(back_populates="user")
 
 
 class Trip(db.Model):
@@ -54,10 +55,14 @@ class Place(db.Model):
     city: Mapped[str] = mapped_column(String(120), nullable=False)
     country: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(Text)
-
+    favorites: Mapped[List["Favorite"]] = relationship(back_populates="place")
 
 class Favorite(db.Model):
     __tablename__ = "favorite"
     id: Mapped[int] = mapped_column(primary_key=True)
+    user_id: Mapped[int] = mapped_column(ForeignKey("user.id"))
+    place_id: Mapped[int] = mapped_column(ForeignKey("place.id"))
     created_at: Mapped[datetime] = mapped_column(
         DateTime, server_default=func.now())
+    user: Mapped["User"] = relationship(back_populates="favorites")
+    place: Mapped["Place"] = relationship(back_populates="favorites")
