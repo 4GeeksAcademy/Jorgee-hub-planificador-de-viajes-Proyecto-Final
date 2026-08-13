@@ -1,81 +1,118 @@
-# WebApp boilerplate with React JS and Flask API
+# Planificador de viajes
 
-Build web applications using React.js for the front end and python/flask for your backend API.
+Aplicación web para crear viajes, organizar destinos y actividades, y guardar lugares favoritos.
 
-- Documentation can be found here: https://4geeks.com/docs/start/react-flask-template
-- Here is a video on [how to use this template](https://www.loom.com/share/f37c6838b3f1496c95111e515e83dd9b)
-- Integrated with Pipenv for package managing.
-- Fast deployment to Render [in just a few steps here](https://4geeks.com/docs/start/deploy-to-render-com).
-- Use of .env file.
-- SQLAlchemy integration for database abstraction.
+## Tecnologías
 
-### 1) Installation:
+- Frontend: React + Vite
+- Backend: Flask
+- Base de datos: PostgreSQL + SQLAlchemy + Flask-Migrate
+- Estado global: Context API con patrón Flux
 
-> If you use Github Codespaces (recommended) or Gitpod this template will already come with Python, Node and the Posgres Database installed. If you are working locally make sure to install Python 3.10, Node 
+## Requisitos locales
 
-It is recomended to install the backend first, make sure you have Python 3.10, Pipenv and a database engine (Posgress recomended)
+- Node.js y npm
+- Python 3.13
+- Pipenv
+- PostgreSQL en ejecución
 
-1. Install the python packages: `$ pipenv install`
-2. Create a .env file based on the .env.example: `$ cp .env.example .env`
-3. Install your database engine and create your database, depending on your database you have to create a DATABASE_URL variable with one of the possible values, make sure you replace the valudes with your database information:
+## Configuración inicial
 
-| Engine    | DATABASE_URL                                        |
-| --------- | --------------------------------------------------- |
-| SQLite    | sqlite:////test.db                                  |
-| MySQL     | mysql://username:password@localhost:port/example    |
-| Postgress | postgres://username:password@localhost:5432/example |
+### 1. Instalar dependencias
 
-4. Migrate the migrations: `$ pipenv run migrate` (skip if you have not made changes to the models on the `./src/api/models.py`)
-5. Run the migrations: `$ pipenv run upgrade`
-6. Run the application: `$ pipenv run start`
-
-> Note: Codespaces users can connect to psql by typing: `psql -h localhost -U gitpod example`
-
-### Undo a migration
-
-You are also able to undo a migration by running
-
-```sh
-$ pipenv run downgrade
+```bash
+npm install
+pipenv install
 ```
 
-### Backend Populate Table Users
+### 2. Configurar variables de entorno
 
-To insert test users in the database execute the following command:
+Crea tu archivo local a partir del ejemplo:
 
-```sh
-$ flask insert-test-users 5
+```bash
+cp .env.example .env
 ```
 
-And you will see the following message:
+Edita `DATABASE_URL` para tu instalación de PostgreSQL. En Linux, si PostgreSQL permite usar el usuario local mediante socket Unix:
 
-```
-  Creating test users
-  test_user1@test.com created.
-  test_user2@test.com created.
-  test_user3@test.com created.
-  test_user4@test.com created.
-  test_user5@test.com created.
-  Users created successfully!
+```env
+DATABASE_URL=postgresql:///planificador_viajes_dev
 ```
 
-### **Important note for the database and the data inside it**
+Si tu instalación exige conexión TCP con contraseña, usa una URL con usuario y contraseña:
 
-Every Github codespace environment will have **its own database**, so if you're working with more people eveyone will have a different database and different records inside it. This data **will be lost**, so don't spend too much time manually creating records for testing, instead, you can automate adding records to your database by editing ```commands.py``` file inside ```/src/api``` folder. Edit line 32 function ```insert_test_data``` to insert the data according to your model (use the function ```insert_test_users``` above as an example). Then, all you need to do is run ```pipenv run insert-test-data```.
+```env
+DATABASE_URL=postgresql://TU_USUARIO:TU_CONTRASENA@localhost:5432/planificador_viajes_dev
+```
 
-### Front-End Manual Installation:
+> `.env` está ignorado por Git. No subas contraseñas, tokens ni claves al repositorio.
 
--   Make sure you are using node version 20 and that you have already successfully installed and runned the backend.
+### 3. Crear la base de datos local
 
-1. Install the packages: `$ npm install`
-2. Start coding! start the webpack dev server `$ npm run start`
+```bash
+createdb planificador_viajes_dev
+```
 
-## Publish your website!
+Si la base ya existe, PostgreSQL mostrará un aviso y puedes continuar.
 
-This boilerplate it's 100% read to deploy with Render.com and Heroku in a matter of minutes. Please read the [official documentation about it](https://4geeks.com/docs/start/deploy-to-render-com).
+### 4. Crear y aplicar migraciones
 
-### Contributors
+Cuando cambien los modelos en `src/api/models.py`:
 
-This template was built as part of the 4Geeks Academy [Coding Bootcamp](https://4geeksacademy.com/us/coding-bootcamp) by [Alejandro Sanchez](https://twitter.com/alesanchezr) and many other contributors. Find out more about our [Full Stack Developer Course](https://4geeksacademy.com/us/coding-bootcamps/part-time-full-stack-developer), and [Data Science Bootcamp](https://4geeksacademy.com/us/coding-bootcamps/datascience-machine-learning).
+```bash
+pipenv run migrate
+pipenv run upgrade
+```
 
-You can find other templates and resources like this at the [school github page](https://github.com/4geeksacademy/).
+Para aplicar migraciones que ya existan:
+
+```bash
+pipenv run upgrade
+```
+
+### 5. Ejecutar la aplicación
+
+En una terminal, inicia Flask:
+
+```bash
+pipenv run start
+```
+
+El backend queda disponible en `http://127.0.0.1:3001`.
+
+En otra terminal, inicia Vite:
+
+```bash
+npm run dev
+```
+
+Vite mostrará la URL local del frontend, normalmente `http://localhost:3000`.
+
+## Comprobaciones rápidas
+
+```bash
+npm run lint
+npm run build
+```
+
+La salud del backend estará disponible en:
+
+```text
+GET /api/health
+```
+
+## Destinos iniciales
+
+Durante el MVP, los destinos disponibles inicialmente son:
+
+- Valparaíso, Chile
+- San José, Costa Rica
+- Río de Janeiro, Brasil
+- Buenos Aires, Argentina
+- Lima, Perú
+
+La selección y las pruebas de las APIs externas de ciudades, lugares y mapas se documentarán como la última tarea de EN-01.
+
+## Modelo actual
+
+El proyecto incluye los modelos `User`, `Trip`, `Destination`, `Activity`, `Place` y `Favorite`. Antes de implementar endpoints o pantallas, las modificaciones de los modelos deben ir acompañadas de su migración correspondiente.
