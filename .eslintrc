@@ -1,11 +1,22 @@
 {
-  "parser": "@babel/eslint-parser",
   "plugins": [
     "react"
   ],
   "env": {
     "browser": true,
-    "es6": true
+    "es2021": true
+  },
+  "parserOptions": {
+    "ecmaVersion": "latest",
+    "sourceType": "module",
+    "ecmaFeatures": {
+      "jsx": true
+    }
+  },
+  "settings": {
+    "react": {
+      "version": "detect"
+    }
   },
   "extends": [ "plugin:react/recommended"],
   "rules": {
@@ -15,7 +26,6 @@
     "no-mixed-spaces-and-tabs": 0,
     "no-debugger": 0, 
     "semi": ["error", "always"],
-    "allowImportExportEverywhere": false,
     "indent": "off",
     "react/jsx-indent": "off",
     "react/jsx-indent-props": "off",
