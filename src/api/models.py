@@ -142,5 +142,5 @@ class Favorite(db.Model):
         return {
             "id": self.id,
             "created_at": self.created_at.isoformat() if self.created_at else None,
-            "place": self.place.serialize()
+            "place": self.place.serialize() if self.place else None
         }
