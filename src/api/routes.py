@@ -5,7 +5,8 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from flask_jwt_extended import create_access_token
 
 api = Blueprint('api', __name__)
 
@@ -35,3 +36,15 @@ def signup():
     db.session.add(new_user)
     db.session.commit()
     return jsonify({"message": "Usuario creado exitosamente"}), 201
+
+
+@api.route('/login', methods=['POST'])
+def login():
+    data = request.json
+    existing_user = User.query.filter_by(email=data["email"]).first()
+    if not existing_user:
+        return jsonify({"error": "Credenciales inválidas"}), 401
+    if not check_password_hash(existing_user.password_hash, data["password"]):
+        return jsonify({"error": "Credenciales inválidas"}), 401
+    access_token = create_access_token(identity=str(existing_user.id))
+    return jsonify({"token": access_token, "user": existing_user.serialize()}), 200
