@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User
+from api.models import db, User, Trip
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -60,3 +60,19 @@ def login():
 def private():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
+
+@api.route('/trips', methods=['POST'])
+@jwt_required()
+def create_trip():
+    data = request.json
+    current_user_id = get_jwt_identity()
+    
+    new_trip = Trip(
+        name= data["name"],
+        start_date= data["start_date"],
+        end_date= data["end_date"],
+        user_id= current_user_id
+    )
+    db.session.add(new_trip)
+    db.session.commit()
+    return jsonify(new_trip.serialize()), 201
