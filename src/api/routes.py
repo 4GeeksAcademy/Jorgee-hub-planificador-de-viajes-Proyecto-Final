@@ -6,7 +6,7 @@ from api.models import db, User
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import create_access_token
+from flask_jwt_extended import (create_access_token, JWTManager, jwt_required, get_jwt_identity)
 
 api = Blueprint('api', __name__)
 
@@ -22,15 +22,21 @@ def health_check():
 @api.route('/signup', methods=['POST'])
 def signup():
     data = request.json
-    existing_user = User.query.filter_by(email=data["email"]).first()
-    if existing_user:
+    existing_user_email = User.query.filter_by(email=data["email"]).first()
+    if existing_user_email:
         return jsonify({"error": "El email ya está registrado"}), 409
+    existing_user_name = User.query.filter_by(username=data["username"]).first()
+    if existing_user_name:
+        return jsonify({"error": "El nombre de usuario ya está registrado"}), 409
+        
 
     new_user = User(
+        username=data["username"],
         email=data["email"],
         password_hash=generate_password_hash(data["password"]),
         first_name=data.get("first_name"),
         last_name=data.get("last_name")
+        
     )
 
     db.session.add(new_user)
@@ -48,3 +54,9 @@ def login():
         return jsonify({"error": "Credenciales inválidas"}), 401
     access_token = create_access_token(identity=str(existing_user.id))
     return jsonify({"token": access_token, "user": existing_user.serialize()}), 200
+
+@api.route('/private', methods=['GET'])
+@jwt_required()
+def private():
+    current_user = get_jwt_identity()
+    return jsonify(logged_in_as=current_user), 200
