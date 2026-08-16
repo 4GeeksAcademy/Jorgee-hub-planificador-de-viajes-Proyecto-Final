@@ -61,7 +61,7 @@ def private():
     current_user = get_jwt_identity()
     return jsonify(logged_in_as=current_user), 200
 
-@api.route('/trips', methods=['POST'])
+@api.route('/trips', methods=['POST'])#Crear trip
 @jwt_required()
 def create_trip():
     data = request.json
@@ -76,3 +76,25 @@ def create_trip():
     db.session.add(new_trip)
     db.session.commit()
     return jsonify(new_trip.serialize()), 201
+
+@api.route('/trips', methods=['GET']) # Listar todos los trips
+def get_trips():
+    pass
+@api.route('/trips/<int:trip_id>', methods=['GET']) #Listar un solo trip
+@jwt_required()
+def get_trip(trip_id):
+        trip = Trip.query.get(trip_id)
+        if not trip:
+            return jsonify ({"error": "Viaje no encontrado"}), 404
+        
+        current_user_id = get_jwt_identity()
+        if str(trip.user_id) != current_user_id:
+            return jsonify ({"error": "No tienes permisos sobre este viaje"}), 403
+        return jsonify(trip.serialize()), 200
+        
+@api.route('/trips/<int:trip_id>', methods=['PUT']) #Actualizar un trip
+def update_trip(trip_id):
+    pass
+@api.route('/trips/<int:trip_id>', methods=['DELETE']) #Borrar un trip
+def delete_trip(trip_id):
+    pass
