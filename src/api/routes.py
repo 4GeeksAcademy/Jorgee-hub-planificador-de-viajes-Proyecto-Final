@@ -117,5 +117,15 @@ def update_trip(trip_id):
     return jsonify(trip.serialize()), 202
 
 @api.route('/trips/<int:trip_id>', methods=['DELETE']) #Borrar un trip
+@jwt_required()
 def delete_trip(trip_id):
-    pass
+    trip = Trip.query.get(trip_id)
+    if not trip:
+        return jsonify({"error": "Viaje no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify ({"error": "No tienes permisos sobre este viaje"}), 403
+    trip_name = trip.name
+    db.session.delete(trip)
+    db.session.commit()
+    return jsonify({"message": f"Viaje '{trip_name}' eliminado correctamente"}), 200
