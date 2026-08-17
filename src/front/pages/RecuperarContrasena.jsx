@@ -27,7 +27,7 @@ export const RecuperarContrasena = () => {
 		event.preventDefault();
 		setSolicitudLista(true);
 		setError("");
-		setMensaje("Solicitud preparada para " + correo + ".");
+		setMensaje("No se envió ningún correo. Esta vista solo habilita el siguiente paso para practicar la interfaz.");
 	};
 
 	const manejarRestablecimiento = (event) => {
@@ -41,7 +41,7 @@ export const RecuperarContrasena = () => {
 		}
 
 		setError("");
-		setMensaje("La nueva contraseña está lista para enviarse cuando el endpoint backend esté disponible.");
+		setMensaje("La nueva contraseña no se guardó. La integración con el backend se realizará más adelante.");
 	};
 
 	return (
@@ -78,7 +78,7 @@ export const RecuperarContrasena = () => {
 									className="mb-4"
 									style={{ color: "#456B75", lineHeight: 1.6 }}
 								>
-									Primero indica tu correo. Luego podrás definir una nueva contraseña.
+									Primero indica tu correo para practicar el flujo. Esta pantalla no envía correos ni guarda cambios todavía.
 								</p>
 
 								{error && (
@@ -125,7 +125,7 @@ export const RecuperarContrasena = () => {
 											borderRadius: 0,
 										}}
 									>
-										Solicitar recuperación
+										Continuar
 									</button>
 								</form>
 

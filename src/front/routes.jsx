@@ -34,7 +34,7 @@ export const router = createBrowserRouter(
 			<Route path="/lab/mapa-lugares" element={<PlacesMapLab />} />
 			<Route path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
-			<Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
+			<Route path="/password-recovery" element={<RecuperarContrasena />} />
 		</Route>
 	)
 );

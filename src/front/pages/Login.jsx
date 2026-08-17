@@ -126,7 +126,7 @@ export const Login = () => {
 											</label>
 										</div>
 										<Link
-											to="/recuperar-contrasena"
+											to="/password-recovery"
 											className="btn p-0 border-0 small text-decoration-none"
 											style={{ color: "#078A9A" }}
 										>
