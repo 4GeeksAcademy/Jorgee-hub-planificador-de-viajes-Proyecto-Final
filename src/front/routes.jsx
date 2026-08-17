@@ -15,6 +15,7 @@ import { MapLab } from "./pages/MapLab";
 import { PlacesMapLab } from "./pages/PlacesMapLab";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
+import { RecuperarContrasena } from "./pages/RecuperarContrasena";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -33,6 +34,7 @@ export const router = createBrowserRouter(
 			<Route path="/lab/mapa-lugares" element={<PlacesMapLab />} />
 			<Route path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
+			<Route path="/recuperar-contrasena" element={<RecuperarContrasena />} />
 		</Route>
 	)
 );

@@ -125,9 +125,13 @@ export const Login = () => {
 												Recordarme
 											</label>
 										</div>
-										<button type="button" className="btn p-0 border-0 small" style={{ color: "#078A9A" }}>
+										<Link
+											to="/recuperar-contrasena"
+											className="btn p-0 border-0 small text-decoration-none"
+											style={{ color: "#078A9A" }}
+										>
 											¿Olvidaste tu contraseña?
-										</button>
+										</Link>
 									</div>
 									<button
 										type="submit"
