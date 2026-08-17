@@ -114,7 +114,7 @@ def update_trip(trip_id):
     trip.end_date = date.fromisoformat(data["end_date"]) if data.get("end_date") else trip.end_date
 
     db.session.commit()
-    return jsonify(trip.serialize()), 202
+    return jsonify(trip.serialize()), 200
 
 @api.route('/trips/<int:trip_id>', methods=['DELETE']) #Borrar un trip
 @jwt_required()
