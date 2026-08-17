@@ -7,7 +7,7 @@ from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (create_access_token, JWTManager, jwt_required, get_jwt_identity)
-
+from datetime import date
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -78,8 +78,13 @@ def create_trip():
     return jsonify(new_trip.serialize()), 201
 
 @api.route('/trips', methods=['GET']) # Listar todos los trips
+@jwt_required()
 def get_trips():
-    pass
+    current_user_id = get_jwt_identity()
+    existing_user_trips = Trip.query.filter_by(user_id=current_user_id).all()
+    trips_serialized =[trip.serialize() for trip in existing_user_trips]
+    return jsonify(trips_serialized), 200
+
 @api.route('/trips/<int:trip_id>', methods=['GET']) #Listar un solo trip
 @jwt_required()
 def get_trip(trip_id):
@@ -93,8 +98,24 @@ def get_trip(trip_id):
         return jsonify(trip.serialize()), 200
         
 @api.route('/trips/<int:trip_id>', methods=['PUT']) #Actualizar un trip
+@jwt_required()
 def update_trip(trip_id):
-    pass
+    data = request.json
+    trip = Trip.query.get(trip_id)
+    if not trip:
+        return jsonify ({"error": "Viaje no encontrado"}), 404
+    
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify ({"error": "No tienes permisos sobre este viaje"}), 403
+    
+    trip.name = data.get("name", trip.name)
+    trip.start_date = date.fromisoformat(data["start_date"]) if data.get("start_date") else trip.start_date
+    trip.end_date = date.fromisoformat(data["end_date"]) if data.get("end_date") else trip.end_date
+
+    db.session.commit()
+    return jsonify(trip.serialize()), 202
+
 @api.route('/trips/<int:trip_id>', methods=['DELETE']) #Borrar un trip
 def delete_trip(trip_id):
     pass
