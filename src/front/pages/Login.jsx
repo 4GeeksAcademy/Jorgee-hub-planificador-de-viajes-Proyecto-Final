@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { obtenerMensajeErrorInicioSesion } from "../utils/autenticacion.mjs";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
@@ -46,7 +47,7 @@ export const Login = () => {
 			const datos = await respuesta.json();
 
 			if (!respuesta.ok) {
-				throw new Error(datos.error || "No fue posible iniciar sesión.");
+				throw new Error(obtenerMensajeErrorInicioSesion(respuesta.status, datos.error));
 			}
 
 			localStorage.setItem("token", datos.token);
