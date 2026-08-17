@@ -16,6 +16,7 @@ import { PlacesMapLab } from "./pages/PlacesMapLab";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
 import { RecuperarContrasena } from "./pages/RecuperarContrasena";
+import { CrearViaje } from "./pages/CrearViaje";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -35,6 +36,7 @@ export const router = createBrowserRouter(
 			<Route path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
 			<Route path="/password-recovery" element={<RecuperarContrasena />} />
+			<Route path="/trips/new" element={<CrearViaje />} />
 		</Route>
 	)
 );

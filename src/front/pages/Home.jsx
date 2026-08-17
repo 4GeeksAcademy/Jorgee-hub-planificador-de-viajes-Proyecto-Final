@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import buenosAires from "../assets/buenos-aires-argentina.jpg";
 import lima from "../assets/lima-peru.jpg";
 import rio from "../assets/rio-de-janeiro-brasil.jpg";
@@ -13,7 +14,7 @@ const destinations = [
   { city: "Lima", country: "Perú", image: lima },
 ];
 
-const Boton = ({ children }) => {
+const Boton = ({ children, onClick }) => {
   const [hovered, setHovered] = useState(false);
   const style = {
     backgroundColor: hovered ? "#0F6B78" : "transparent",
@@ -30,6 +31,7 @@ const Boton = ({ children }) => {
       style={style}
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
     >
       {children}
     </button>
@@ -96,6 +98,7 @@ const TarjetaDestino = ({ destination, large = false }) => {
 };
 
 export const Home = () => {
+  const navigate = useNavigate();
   const [activeDestination, setActiveDestination] = useState(0);
 
   useEffect(() => {
@@ -154,7 +157,7 @@ export const Home = () => {
                 espacio para disfrutar más y preocuparte menos.
               </p>
               <div className="d-flex flex-wrap gap-3">
-                <Boton>Crear mi viaje</Boton>
+                <Boton onClick={() => navigate("/trips/new")}>Crear mi viaje</Boton>
                 <Boton>Explorar destinos</Boton>
               </div>
             </div>
