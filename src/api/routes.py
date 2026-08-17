@@ -78,8 +78,12 @@ def create_trip():
     return jsonify(new_trip.serialize()), 201
 
 @api.route('/trips', methods=['GET']) # Listar todos los trips
+@jwt_required()
 def get_trips():
-    pass
+    current_user_id = get_jwt_identity()
+    existing_user_trips = Trip.query.filter_by(user_id=current_user_id).all()
+    trips_serialized =[trip.serialize() for trip in existing_user_trips]
+    return jsonify(trips_serialized), 200
 @api.route('/trips/<int:trip_id>', methods=['GET']) #Listar un solo trip
 @jwt_required()
 def get_trip(trip_id):
