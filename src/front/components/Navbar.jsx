@@ -64,15 +64,6 @@ export const Navbar = () => (
 							Favoritos
 						</a>
 					</li>
-					<li className="nav-item">
-						<Link
-							to="/dev"
-							className="nav-link fw-semibold"
-							style={{ color: "#28C3D4" }}
-						>
-							DEV
-						</Link>
-					</li>
 					<li className="nav-item dropdown">
 						<button
 							className="btn border-0 p-2 dropdown-toggle"
