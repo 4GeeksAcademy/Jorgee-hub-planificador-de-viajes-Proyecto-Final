@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import { formatearFechaViaje } from "../utils/viajes.mjs";
 
 export const MisViajes = () => {
+	const location = useLocation();
 	const [viajes, setViajes] = useState([]);
 	const [cargando, setCargando] = useState(true);
 	const [error, setError] = useState("");
@@ -55,6 +56,11 @@ export const MisViajes = () => {
 					</Link>
 				</div>
 
+				{location.state?.mensaje && (
+					<div className="alert alert-success rounded-0" role="status">
+						{location.state.mensaje}
+					</div>
+				)}
 				{cargando && <p style={{ color: "#456B75" }}>Cargando tus viajes...</p>}
 				{error && <div className="alert alert-danger rounded-0" role="alert">{error}</div>}
 				{!cargando && !error && viajes.length === 0 && (
