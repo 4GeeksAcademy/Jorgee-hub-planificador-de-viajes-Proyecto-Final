@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { validarDatosPersonalesRegistro } from "../utils/registro.mjs";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
@@ -43,6 +44,15 @@ export const Register = () => {
 		event.preventDefault();
 		setError("");
 		setExito("");
+
+		const errorDatosPersonales = validarDatosPersonalesRegistro(
+			formulario.first_name,
+			formulario.last_name
+		);
+		if (errorDatosPersonales) {
+			setError(errorDatosPersonales);
+			return;
+		}
 
 		if (!aceptaTerminos) {
 			setError("Debes aceptar los términos de uso para crear tu cuenta.");

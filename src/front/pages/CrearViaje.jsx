@@ -1,6 +1,10 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { validarFechasViaje } from "../utils/viajes.mjs";
+import {
+	obtenerFechaMinimaViaje,
+	validarFechasViaje,
+	validarFechaInicioViaje,
+} from "../utils/viajes.mjs";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
@@ -25,6 +29,7 @@ export const CrearViaje = () => {
 	const [cargando, setCargando] = useState(false);
 	const [error, setError] = useState("");
 	const [exito, setExito] = useState("");
+	const fechaMinima = obtenerFechaMinimaViaje(new Date());
 
 	const manejarCambio = (event) => {
 		const { name, value } = event.target;
@@ -35,6 +40,15 @@ export const CrearViaje = () => {
 		event.preventDefault();
 		setError("");
 		setExito("");
+
+		const errorFechaInicio = validarFechaInicioViaje(
+			formulario.start_date,
+			fechaMinima
+		);
+		if (errorFechaInicio) {
+			setError(errorFechaInicio);
+			return;
+		}
 
 		const errorFechas = validarFechasViaje(formulario.start_date, formulario.end_date);
 		if (errorFechas) {
@@ -164,6 +178,7 @@ export const CrearViaje = () => {
 													name="start_date"
 													type="date"
 													required
+													min={fechaMinima}
 													value={formulario.start_date}
 													onChange={manejarCambio}
 													className="form-control"
@@ -185,6 +200,7 @@ export const CrearViaje = () => {
 													name="end_date"
 													type="date"
 													required
+													min={formulario.start_date || fechaMinima}
 													value={formulario.end_date}
 													onChange={manejarCambio}
 													className="form-control"
