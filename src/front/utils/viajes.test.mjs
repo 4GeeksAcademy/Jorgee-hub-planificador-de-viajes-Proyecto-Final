@@ -1,6 +1,9 @@
 import test from "node:test";
 import assert from "node:assert/strict";
-import { validarFechasViaje } from "./viajes.mjs";
+import {
+	formatearFechaViaje,
+	validarFechasViaje,
+} from "./viajes.mjs";
 
 test("acepta fechas de viaje en orden cronológico", () => {
 	assert.equal(validarFechasViaje("2026-09-10", "2026-09-15"), "");
@@ -18,4 +21,8 @@ test("rechaza fechas de inicio y regreso iguales", () => {
 		validarFechasViaje("2026-09-15", "2026-09-15"),
 		"La fecha de regreso debe ser posterior a la fecha de inicio."
 	);
+});
+
+test("formatea una fecha ISO para mostrarla en español", () => {
+	assert.equal(formatearFechaViaje("2026-09-15"), "15 sept 2026");
 });

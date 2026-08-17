@@ -71,13 +71,13 @@ export const Navbar = () => {
 							</a>
 						</li>
 						<li className="nav-item">
-							<a
+							<Link
+								to="/trips"
 								className="nav-link"
-								href="#accesos"
 								style={{ color: "#D4F0F5" }}
 							>
 								Mis viajes
-							</a>
+							</Link>
 						</li>
 						<li className="nav-item">
 							<a
