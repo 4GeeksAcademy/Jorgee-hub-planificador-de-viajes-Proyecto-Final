@@ -52,6 +52,7 @@ export const Login = () => {
 
 			localStorage.setItem("token", datos.token);
 			localStorage.setItem("user", JSON.stringify(datos.user));
+			window.dispatchEvent(new Event("sesion-cambiada"));
 			navigate("/");
 		} catch (errorDeRed) {
 			setError(errorDeRed.message || "No fue posible conectar con el servidor.");
