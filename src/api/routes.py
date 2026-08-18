@@ -8,6 +8,7 @@ from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (create_access_token, JWTManager, jwt_required, get_jwt_identity)
 from datetime import date
+from sqlalchemy import or_
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -47,7 +48,7 @@ def signup():
 @api.route('/login', methods=['POST'])
 def login():
     data = request.json
-    existing_user = User.query.filter_by(email=data["email"]).first()
+    existing_user = User.query.filter(or_(User.email == data["identifier"], User.username == data["identifier"])).first()
     if not existing_user:
         return jsonify({"error": "Credenciales inválidas"}), 401
     if not check_password_hash(existing_user.password_hash, data["password"]):
