@@ -118,13 +118,7 @@ export const Login = () => {
 											style={estiloInput}
 										/>
 									</div>
-									<div className="d-flex justify-content-between align-items-center gap-3 mb-4">
-										<div className="form-check">
-											<input id="remember-me" type="checkbox" className="form-check-input" />
-											<label htmlFor="remember-me" className="form-check-label small" style={{ color: "#456B75" }}>
-												Recordarme
-											</label>
-										</div>
+									<div className="d-flex justify-content-end mb-4">
 										<Link
 											to="/password-recovery"
 											className="btn p-0 border-0 small text-decoration-none"

@@ -15,10 +15,11 @@ import { MapLab } from "./pages/MapLab";
 import { PlacesMapLab } from "./pages/PlacesMapLab";
 import { Login } from "./pages/Login";
 import { Register } from "./pages/Register";
-import { RecuperarContrasena } from "./pages/RecuperarContrasena";
+import { RecuperarContr } from "./pages/RecuperarContr";
 import { CrearViaje } from "./pages/CrearViaje";
 import { DetalleViaje } from "./pages/DetalleViaje";
 import { MisViajes } from "./pages/MisViajes";
+import { RutaProtegida } from "./components/RutaProtegida";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -37,10 +38,12 @@ export const router = createBrowserRouter(
 			<Route path="/lab/mapa-lugares" element={<PlacesMapLab />} />
 			<Route path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
-			<Route path="/password-recovery" element={<RecuperarContrasena />} />
-			<Route path="/trips/new" element={<CrearViaje />} />
-			<Route path="/trips" element={<MisViajes />} />
-			<Route path="/trips/:tripId" element={<DetalleViaje />} />
+			<Route path="/password-recovery" element={<RecuperarContr />} />
+			<Route element={<RutaProtegida />}>
+				<Route path="/trips/new" element={<CrearViaje />} />
+				<Route path="/trips" element={<MisViajes />} />
+				<Route path="/trips/:tripId" element={<DetalleViaje />} />
+			</Route>
 		</Route>
 	)
 );

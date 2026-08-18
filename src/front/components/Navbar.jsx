@@ -102,7 +102,19 @@ export const Navbar = () => {
 									aria-hidden="true"
 								/>
 							</button>
-							<ul className="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2">
+							<ul
+								className="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2 p-2"
+								style={{
+									backgroundColor: "#EAF7FA",
+									"--bs-dropdown-link-hover-bg": "#D4F0F5",
+									"--bs-dropdown-link-hover-color": "#12343B",
+									"--bs-dropdown-link-active-bg": "#12343B",
+									"--bs-dropdown-link-active-color": "#FFFFFF",
+									borderTop: "3px solid #28C3D4",
+									borderRadius: 0,
+									minWidth: "12rem",
+								}}
+							>
 								{sesionActiva ? (
 									<li>
 										<button

@@ -14,10 +14,10 @@ const mesesCortos = [
 ];
 
 export const obtenerFechaMinimaViaje = (fechaActual) => {
-	const anio = fechaActual.getFullYear();
+	const year = fechaActual.getFullYear();
 	const mes = String(fechaActual.getMonth() + 1).padStart(2, "0");
 	const dia = String(fechaActual.getDate()).padStart(2, "0");
-	return `${anio}-${mes}-${dia}`;
+	return `${year}-${mes}-${dia}`;
 };
 
 export const validarFechaInicioViaje = (fechaInicio, fechaMinima) => {
@@ -36,11 +36,30 @@ export const validarFechasViaje = (fechaInicio, fechaFin) => {
 	return "";
 };
 
+export const ordenarViajes = (viajes, criterio, direccion) => {
+	const factor = direccion === "desc" ? -1 : 1;
+
+	return [...viajes].sort((viajeA, viajeB) => (
+		String(viajeA[criterio] || "").localeCompare(
+			String(viajeB[criterio] || ""),
+			"es"
+		) * factor
+	));
+};
+
+export const truncarNombreViaje = (nombre, limite = 18) => {
+	if (nombre.length <= limite) {
+		return nombre;
+	}
+
+	return `${nombre.slice(0, limite)}...`;
+};
+
 export const formatearFechaViaje = (fechaIso) => {
 	if (!fechaIso) {
 		return "Sin fecha";
 	}
 
-	const [anio, mes, dia] = fechaIso.split("-");
-	return `${Number(dia)} ${mesesCortos[Number(mes) - 1]} ${anio}`;
+	const [year, mes, dia] = fechaIso.split("-");
+	return `${Number(dia)} ${mesesCortos[Number(mes) - 1]} ${year}`;
 };

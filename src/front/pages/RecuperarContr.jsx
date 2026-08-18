@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Link } from "react-router-dom";
-import { validarNuevaContrasena } from "../utils/recuperacionContrasena.mjs";
+import { FormularioNuevaContrasena } from "../components/FormularioNuevaContrasena";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
@@ -15,7 +15,15 @@ const estiloInput = {
 	padding: "0.75rem 0.9rem",
 };
 
-export const RecuperarContrasena = () => {
+const validarNuevaContrasena = (contrasena, confirmacion) => {
+	if (contrasena !== confirmacion) {
+		return "Las contraseñas no coinciden.";
+	}
+
+	return "";
+};
+
+export const RecuperarContr = () => {
 	const [correo, setCorreo] = useState("");
 	const [solicitudLista, setSolicitudLista] = useState(false);
 	const [nuevaContrasena, setNuevaContrasena] = useState("");
@@ -27,7 +35,7 @@ export const RecuperarContrasena = () => {
 		event.preventDefault();
 		setSolicitudLista(true);
 		setError("");
-		setMensaje("Solicitud preparada para " + correo + ".");
+		setMensaje("");
 	};
 
 	const manejarRestablecimiento = (event) => {
@@ -53,7 +61,7 @@ export const RecuperarContrasena = () => {
 				<div className="row justify-content-center">
 					<div className="col-lg-10 col-xl-9">
 						<div className="row g-0 shadow-sm">
-							{/* Formularios de recuperación */}
+							{/* Flujo de recuperación */}
 							<section
 								className="col-lg-7 p-4 p-lg-5"
 								style={{ backgroundColor: "#FFFFFF" }}
@@ -67,18 +75,6 @@ export const RecuperarContrasena = () => {
 									}}
 								>
 									Acceso a tu cuenta
-								</p>
-								<h1
-									className="display-6 mb-3"
-									style={estiloTitulo}
-								>
-									Recupera tu contraseña
-								</h1>
-								<p
-									className="mb-4"
-									style={{ color: "#456B75", lineHeight: 1.6 }}
-								>
-									Primero indica tu correo. Luego podrás definir una nueva contraseña.
 								</p>
 
 								{error && (
@@ -98,96 +94,55 @@ export const RecuperarContrasena = () => {
 									</div>
 								)}
 
-								<form onSubmit={manejarSolicitud}>
-									<label
-										htmlFor="recovery-email"
-										className="form-label small fw-semibold"
-										style={{ color: "#12343B" }}
-									>
-										Correo electrónico
-									</label>
-									<input
-										id="recovery-email"
-										type="email"
-										required
-										value={correo}
-										onChange={(event) => setCorreo(event.target.value)}
-										className="form-control mb-3"
-										placeholder="tu@email.com"
-										style={estiloInput}
+								{solicitudLista ? (
+									<FormularioNuevaContrasena
+										nuevaContrasena={nuevaContrasena}
+										setNuevaContrasena={setNuevaContrasena}
+										confirmacion={confirmacion}
+										setConfirmacion={setConfirmacion}
+										manejarRestablecimiento={manejarRestablecimiento}
 									/>
-									<button
-										type="submit"
-										className="btn w-100 py-3 mb-4"
-										style={{
-											backgroundColor: "#12343B",
-											color: "#FFFFFF",
-											borderRadius: 0,
-										}}
-									>
-										Solicitar recuperación
-									</button>
-								</form>
-
-								{solicitudLista && (
-									<form
-										onSubmit={manejarRestablecimiento}
-										className="pt-4 border-top"
-									>
-										<h2
-											className="h4 mb-3"
+								) : (
+									<form onSubmit={manejarSolicitud}>
+										<h1
+											className="display-6 mb-3"
 											style={estiloTitulo}
 										>
-											Establece una nueva contraseña
-										</h2>
-										<div className="mb-3">
-											<label
-												htmlFor="new-password"
-												className="form-label small fw-semibold"
-												style={{ color: "#12343B" }}
-											>
-												Nueva contraseña
-											</label>
-											<input
-												id="new-password"
-												type="password"
-												required
-												minLength="8"
-												value={nuevaContrasena}
-												onChange={(event) => setNuevaContrasena(event.target.value)}
-												className="form-control"
-												style={estiloInput}
-											/>
-										</div>
-										<div className="mb-4">
-											<label
-												htmlFor="confirm-password"
-												className="form-label small fw-semibold"
-												style={{ color: "#12343B" }}
-											>
-												Confirma tu nueva contraseña
-											</label>
-											<input
-												id="confirm-password"
-												type="password"
-												required
-												minLength="8"
-												value={confirmacion}
-												onChange={(event) => setConfirmacion(event.target.value)}
-												className="form-control"
-												style={estiloInput}
-											/>
-										</div>
+											Recupera tu contraseña
+										</h1>
+										<p
+											className="mb-4"
+											style={{ color: "#456B75", lineHeight: 1.6 }}
+										>
+											Primero indica tu correo. Luego podrás definir una nueva contraseña.
+										</p>
+										<label
+											htmlFor="recovery-email"
+											className="form-label small fw-semibold"
+											style={{ color: "#12343B" }}
+										>
+											Correo electrónico
+										</label>
+										<input
+											id="recovery-email"
+											type="email"
+											required
+											value={correo}
+											onChange={(event) => setCorreo(event.target.value)}
+											className="form-control mb-3"
+											placeholder="tu@email.com"
+											style={estiloInput}
+										/>
 										<button
 											type="submit"
 											className="btn w-100 py-3"
 											style={{
-												backgroundColor: "#28C3D4",
-												color: "#12343B",
+												backgroundColor: "#12343B",
+												color: "#FFFFFF",
 												borderRadius: 0,
 											}}
 										>
-											Guardar nueva contraseña
+											Solicitar recuperación
 										</button>
 									</form>
 								)}

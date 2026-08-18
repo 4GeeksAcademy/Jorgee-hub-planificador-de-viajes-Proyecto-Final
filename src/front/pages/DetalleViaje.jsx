@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
+import { ModalConfirmacionEliminacion } from "../components/ModalConfirmacionEliminacion";
 import { formatearFechaViaje, validarFechasViaje } from "../utils/viajes.mjs";
 
 const estiloTitulo = {
@@ -21,7 +22,7 @@ export const DetalleViaje = () => {
 	const [formulario, setFormulario] = useState(null);
 	const [cargando, setCargando] = useState(true);
 	const [guardando, setGuardando] = useState(false);
-	const [confirmandoEliminacion, setConfirmandoEliminacion] = useState(false);
+	const [modalEliminacionAbierto, setModalEliminacionAbierto] = useState(false);
 	const [error, setError] = useState("");
 	const [exito, setExito] = useState("");
 
@@ -103,11 +104,6 @@ export const DetalleViaje = () => {
 	};
 
 	const eliminarViaje = async () => {
-		if (!confirmandoEliminacion) {
-			setConfirmandoEliminacion(true);
-			return;
-		}
-
 		setError("");
 		setGuardando(true);
 		try {
@@ -201,23 +197,29 @@ export const DetalleViaje = () => {
 							</button>
 						</form>
 
-						{/* Eliminación con confirmación explícita */}
+						{/* Eliminación del viaje */}
 						<div className="border-top pt-4 mt-5">
 							<h2 className="h3 mb-2" style={estiloTitulo}>Eliminar viaje</h2>
 							<p style={{ color: "#456B75" }}>
 								Esta acción elimina el viaje y no se puede deshacer.
 							</p>
-							<button type="button" onClick={eliminarViaje} disabled={guardando} className="btn btn-outline-danger rounded-0 px-4 py-3">
-								{confirmandoEliminacion ? "Confirmar eliminación" : "Eliminar viaje"}
+							<button
+								type="button"
+								onClick={() => setModalEliminacionAbierto(true)}
+								disabled={guardando}
+								className="btn btn-outline-danger rounded-0 px-4 py-3"
+							>
+								Eliminar viaje
 							</button>
-							{confirmandoEliminacion && (
-								<button type="button" onClick={() => setConfirmandoEliminacion(false)} disabled={guardando} className="btn btn-link ms-2" style={{ color: "#456B75" }}>
-									Cancelar
-								</button>
-							)}
 						</div>
 					</section>
 				)}
+				<ModalConfirmacionEliminacion
+					visible={modalEliminacionAbierto}
+					cargando={guardando}
+					alCancelar={() => setModalEliminacionAbierto(false)}
+					alConfirmar={eliminarViaje}
+				/>
 			</div>
 		</main>
 	);

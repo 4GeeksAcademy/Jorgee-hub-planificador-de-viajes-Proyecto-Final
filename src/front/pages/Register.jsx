@@ -1,6 +1,13 @@
 import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { validarDatosPersonalesRegistro } from "../utils/registro.mjs";
+
+const validarDatosPersonalesRegistro = (nombre, apellido) => {
+	if (!nombre.trim() || !apellido.trim()) {
+		return "El nombre y el apellido son obligatorios.";
+	}
+
+	return "";
+};
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
