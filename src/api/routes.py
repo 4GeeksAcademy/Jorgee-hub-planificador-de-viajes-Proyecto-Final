@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Trip
+from api.models import db, User, Trip, Destination, Activity
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -130,3 +130,22 @@ def delete_trip(trip_id):
     db.session.delete(trip)
     db.session.commit()
     return jsonify({"message": f"Viaje '{trip_name}' eliminado correctamente"}), 200
+
+@api.route('/trips/<int:trip_id>/itinerary', methods=['GET'])
+@jwt_required()
+def get_itinerary(trip_id):
+    trip = Trip.query.get(trip_id)
+    if not trip:
+        return jsonify({"error": "Viaje no encontrado"}), 404
+    
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    
+    date_param = request.args.get("date")
+    date_converted = date.fromisoformat(date_param) if date_param else None
+    activities = Activity.query.join(Destination).filter(
+        Destination.trip_id == trip_id,
+        Activity.date == date_converted
+    ).order_by(Activity.time).all()
+    return jsonify([activity.serialize() for activity in activities]), 200
