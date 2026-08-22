@@ -161,3 +161,23 @@ def get_destination(destination_id):
         return jsonify({"error": "No tienes permisos sobre este destino"}), 403
     
     return jsonify(destination.serialize()), 200
+
+
+@api.route('/trips/<int:trip_id>/destinations', methods=['POST'])
+@jwt_required()
+def create_destination(trip_id):
+    data = request.json
+    trip = Trip.query.get(trip_id)
+    if not trip:
+        return jsonify ({"error": "Viaje no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    new_destination = Destination(
+            city= data["city"],
+            country= data["country"],
+            trip_id= trip_id
+        )
+    db.session.add(new_destination)
+    db.session.commit()
+    return jsonify(new_destination.serialize()), 201
