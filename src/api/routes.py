@@ -149,3 +149,15 @@ def get_itinerary(trip_id):
         Activity.date == date_converted
     ).order_by(Activity.time).all()
     return jsonify([activity.serialize() for activity in activities]), 200
+
+@api.route('/destinations/<int:destination_id>', methods=['GET'])
+@jwt_required()
+def get_destination(destination_id):
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "Destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este destino"}), 403
+    
+    return jsonify(destination.serialize()), 200
