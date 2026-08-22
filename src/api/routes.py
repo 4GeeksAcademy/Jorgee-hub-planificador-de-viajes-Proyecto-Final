@@ -209,3 +209,17 @@ def update_destination(destination_id):
     destination.country = data.get("country", destination.country)
     db.session.commit()
     return jsonify(destination.serialize()), 200
+
+@api.route('/destinations/<int:destination_id>', methods=['DELETE']) #Borrar un destino
+@jwt_required()
+def delete_destination(destination_id):
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify ({"error": "No tienes permisos sobre este destino"}), 403
+    destination_name = destination.name
+    db.session.delete(destination)
+    db.session.commit()
+    return jsonify({"message": f"Destino '{destination_name}' eliminado correctamente"}), 200
