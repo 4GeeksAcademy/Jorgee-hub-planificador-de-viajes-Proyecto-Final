@@ -181,3 +181,15 @@ def create_destination(trip_id):
     db.session.add(new_destination)
     db.session.commit()
     return jsonify(new_destination.serialize()), 201
+
+@api.route('/trips/<int:trip_id>/destinations', methods=['GET'])
+@jwt_required()
+def get_destinations(trip_id):
+    trip= Trip.query.get(trip_id)
+    if not trip:
+        return jsonify({"error": "Viaje no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    destinations = Destination.query.filter_by(trip_id= trip_id).all()
+    return jsonify([destination.serialize() for destination in destinations]), 200
