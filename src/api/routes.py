@@ -223,3 +223,80 @@ def delete_destination(destination_id):
     db.session.delete(destination)
     db.session.commit()
     return jsonify({"message": f"Destino '{destination_name}' eliminado correctamente"}), 200
+
+@api.route('/activities/<int:activity_id>', methods=['GET'])
+@jwt_required()
+def get_activity(activity_id):
+    activity = Activity.query.get(activity_id)
+    if not activity:
+        return jsonify({"error": "Actividad no encontrada"}), 404
+    current_user_id = get_jwt_identity()
+    if str(activity.destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre esta actividad"}), 403
+    return jsonify(activity.serialize()), 200
+
+@api.route('/destinations/<int:destination_id>/activities', methods=['POST'])
+@jwt_required()
+def create_activity(destination_id):
+    data = request.json
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "Destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre esta actividad"}), 403
+    new_activity = Activity(
+        name=data["name"],
+        date=date.fromisoformat(data["date"]) if data.get("date") else None,
+        time=data.get("time"),
+        notes=data.get("notes"),
+        destination_id=destination_id
+    )   
+    db.session.add(new_activity)
+    db.session.commit()
+    
+    return jsonify(new_activity.serialize()), 201
+
+@api.route('/destinations/<int:destination_id>/activities', methods=['GET'])
+@jwt_required()
+def get_activities(destination_id):
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "Destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este destino"}), 403
+    activities = Activity.query.filter_by(destination_id = destination_id).all()
+    return jsonify([activity.serialize() for activity in activities]), 200
+
+@api.route('/activities/<int:activity_id>', methods=['PUT'])
+@jwt_required()
+def update_activity(activity_id):
+    data = request.json
+    activity = Activity.query.get(activity_id)
+    if not activity:
+        return jsonify({"error": "Actividad no encontrada"}), 404
+    current_user_id = get_jwt_identity()
+    if str(activity.destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre esta actividad"}), 403
+    activity.name = data.get("name", activity.name)
+    activity.date = date.fromisoformat(data["date"]) if data.get("date") else activity.date
+    activity.time = data.get("time", activity.time)
+    activity.notes = data.get("notes", activity.notes)
+    
+    db.session.commit()
+    return jsonify(activity.serialize()), 200
+
+@api.route('/activities/<int:activity_id>', methods=['DELETE'])
+@jwt_required()
+def delete_activity(activity_id):
+    activity = Activity.query.get(activity_id)
+    if not activity:
+        return jsonify({"error": "Actividad no encontrada"}), 404
+    current_user_id = get_jwt_identity()
+    if str(activity.destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    activity_name = activity.name
+    db.session.delete(activity)
+    db.session.commit()
+    return jsonify({"message": f"Actividad `{activity_name}` eliminada correctamente"}), 200
