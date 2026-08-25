@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Trip, Destination, Activity
+from api.models import db, User, Trip, Destination, Activity, Place
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -300,3 +300,10 @@ def delete_activity(activity_id):
     db.session.delete(activity)
     db.session.commit()
     return jsonify({"message": f"Actividad `{activity_name}` eliminada correctamente"}), 200
+
+@api.route('/places', methods=['GET'])
+@jwt_required()
+def get_places():
+    places = Place.query.all()
+    return jsonify([place.serialize() for place in places]), 200
+    
