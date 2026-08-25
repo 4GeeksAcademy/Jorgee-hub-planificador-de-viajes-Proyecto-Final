@@ -223,3 +223,14 @@ def delete_destination(destination_id):
     db.session.delete(destination)
     db.session.commit()
     return jsonify({"message": f"Destino '{destination_name}' eliminado correctamente"}), 200
+
+@api.route('/activities/<int:activity_id>', methods=['GET'])
+@jwt_required()
+def get_activity(activity_id):
+    activity = Activity.query.get(activity_id)
+    if not activity:
+        return jsonify({"error": "Actividad no encontrada"}), 404
+    current_user_id = get_jwt_identity()
+    if str(activity.destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre esta actividad"}), 403
+    return jsonify(activity.serialize()), 200
