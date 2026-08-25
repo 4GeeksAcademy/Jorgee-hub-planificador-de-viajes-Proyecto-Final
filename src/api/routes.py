@@ -337,3 +337,15 @@ def get_favorites():
     favorites = Favorite.query.filter_by(user_id=current_user_id).all()
     return jsonify([favorite.serialize() for favorite in favorites]), 200
 
+@api.route('/favorites/<int:favorite_id>', methods=['DELETE'])
+@jwt_required()
+def delete_favorite(favorite_id):
+    favorite = Favorite.query.get(favorite_id)
+    if not favorite:
+        return jsonify({"error": "Favorito no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(favorite.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este favorito"}), 403
+    db.session.delete(favorite)
+    db.session.commit()
+    return jsonify({"message": "Favorito eliminado correctamente"}), 200
