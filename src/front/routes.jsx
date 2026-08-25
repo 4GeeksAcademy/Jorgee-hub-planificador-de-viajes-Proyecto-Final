@@ -20,6 +20,7 @@ import { CrearViaje } from "./pages/CrearViaje";
 import { DetalleViaje } from "./pages/DetalleViaje";
 import { MisViajes } from "./pages/MisViajes";
 import { RutaProtegida } from "./components/RutaProtegida";
+import { AnimacionesDev } from "./pages/AnimacionesDev";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -36,9 +37,10 @@ export const router = createBrowserRouter(
 			<Route path="/lab/lugares" element={<PlacesLab />} />
 			<Route path="/lab/mapa" element={<MapLab />} />
 			<Route path="/lab/mapa-lugares" element={<PlacesMapLab />} />
+			<Route path="/dev/animaciones" element={<AnimacionesDev />} />
 			<Route path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
-			<Route path="/password-recovery" element={<RecuperarContr />} />
+			<Route path="/recuperacion" element={<RecuperarContr />} />
 			<Route element={<RutaProtegida />}>
 				<Route path="/trips/new" element={<CrearViaje />} />
 				<Route path="/trips" element={<MisViajes />} />

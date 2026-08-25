@@ -1,3 +1,7 @@
+import { useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
 	fontWeight: 600,
@@ -18,8 +22,22 @@ export const FormularioNuevaContrasena = ({
 	setConfirmacion,
 	manejarRestablecimiento,
 }) => {
+	const layoutRef = useRef(null)
+
+	useGSAP(()=>{
+		gsap.from(layoutRef.current, {
+			x: -60,
+			opacity: 0,
+			duration: 0.8,
+			ease: "power3.out"
+		})
+	}, {
+		scope: layoutRef
+	})
+
 	return (
-		<form onSubmit={manejarRestablecimiento}>
+		<form onSubmit={manejarRestablecimiento}
+		ref={layoutRef}>
 			<h1
 				className="display-6 mb-3"
 				style={estiloTitulo}

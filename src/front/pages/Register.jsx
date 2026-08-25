@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useSplitEntrance } from "../hooks/useSplitEntrance";
 
 const validarDatosPersonalesRegistro = (nombre, apellido) => {
 	if (!nombre.trim() || !apellido.trim()) {
@@ -41,6 +42,9 @@ export const Register = () => {
 	const [cargando, setCargando] = useState(false);
 	const [error, setError] = useState("");
 	const [exito, setExito] = useState("");
+	const layourRef = useRef(null)
+
+	useSplitEntrance(layourRef)
 
 	const manejarCambio = (event) => {
 		const { name, value } = event.target;
@@ -95,9 +99,9 @@ export const Register = () => {
 			<div className="container">
 				<div className="row justify-content-center">
 					<div className="col-lg-10 col-xl-9">
-						<div className="row g-0 shadow-sm">
+						<div className="row g-0 shadow-sm" ref={layourRef}>
 							{/* Formulario de Register */}
-							<section className="col-lg-7 p-4 p-lg-5" style={{ backgroundColor: "#12343B" }}>
+							<section className="col-lg-7 p-4 p-lg-5 split-left" style={{ backgroundColor: "#12343B" }}>
 								<p className="mb-2 text-uppercase fw-semibold" style={estiloEtiqueta}>
 									Empieza a planificar
 								</p>
@@ -238,7 +242,7 @@ export const Register = () => {
 							</section>
 
 							{/* Mensaje de apoyo */}
-							<section className="col-lg-5 d-none d-lg-flex align-items-center p-5" style={{ backgroundColor: "#FFFFFF" }}>
+							<section className="col-lg-5 d-none d-lg-flex align-items-center p-5 split-right" style={{ backgroundColor: "#FFFFFF" }}>
 								<div className="p-4" style={{ borderLeft: "3px solid #28C3D4" }}>
 									<p className="mb-2 text-uppercase fw-semibold" style={{ ...estiloEtiqueta, color: "#078A9A" }}>
 										Tu próximo viaje
