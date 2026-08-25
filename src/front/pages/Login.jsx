@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { obtenerMensajeErrorInicioSesion } from "../utils/autenticacion.mjs";
+import { useSplitEntrance } from "../hooks/useSplitEntrance";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
@@ -26,6 +27,7 @@ export const Login = () => {
 	const [formulario, setFormulario] = useState({ email: "", password: "" });
 	const [cargando, setCargando] = useState(false);
 	const [error, setError] = useState("");
+	const layoutRef = useRef(null)
 
 	const manejarCambio = (event) => {
 		const { name, value } = event.target;
@@ -61,14 +63,16 @@ export const Login = () => {
 		}
 	};
 
+	useSplitEntrance(layoutRef)
+
 	return (
 		<main className="min-vh-100 d-flex align-items-center py-5" style={{ backgroundColor: "#EAF7FA" }}>
 			<div className="container">
 				<div className="row justify-content-center">
 					<div className="col-lg-10 col-xl-9">
-						<div className="row g-0 shadow-sm">
+						<div className="row g-0 shadow-sm" ref={layoutRef}>
 							{/* Formulario de Login */}
-							<section className="col-lg-6 p-4 p-lg-5" style={{ backgroundColor: "#FFFFFF" }}>
+							<section className="col-lg-6 p-4 p-lg-5 split-left" style={{ backgroundColor: "#FFFFFF" }}>
 								<p className="mb-2 text-uppercase fw-semibold" style={estiloEtiqueta}>
 									Bienvenido de nuevo
 								</p>
@@ -120,7 +124,7 @@ export const Login = () => {
 									</div>
 									<div className="d-flex justify-content-end mb-4">
 										<Link
-											to="/password-recovery"
+											to="/recuperacion"
 											className="btn p-0 border-0 small text-decoration-none"
 											style={{ color: "#078A9A" }}
 										>
@@ -146,7 +150,7 @@ export const Login = () => {
 							</section>
 
 							{/* Mensaje de apoyo */}
-							<section className="col-lg-6 d-none d-lg-flex align-items-center p-5" style={{ backgroundColor: "#12343B" }}>
+							<section className="col-lg-6 d-none d-lg-flex align-items-center p-5 split-right" style={{ backgroundColor: "#12343B" }}>
 								<div className="p-4" style={{ borderLeft: "3px solid #28C3D4" }}>
 									<p className="mb-2 text-uppercase fw-semibold" style={{ ...estiloEtiqueta, color: "#28C3D4" }}>
 										Viajero
