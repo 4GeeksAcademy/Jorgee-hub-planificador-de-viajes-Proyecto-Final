@@ -307,3 +307,10 @@ def get_places():
     places = Place.query.all()
     return jsonify([place.serialize() for place in places]), 200
     
+@api.route('/places/<int:place_id>', methods=['GET'])
+@jwt_required()
+def get_place(place_id):
+    place = Place.query.get(place_id)
+    if not place:
+        return jsonify({"error": "Lugar no encontrado"}), 404
+    return jsonify(place.serialize()), 200
