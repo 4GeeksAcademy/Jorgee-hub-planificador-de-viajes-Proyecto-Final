@@ -248,11 +248,23 @@ def create_activity(destination_id):
     new_activity = Activity(
         name=data["name"],
         date=date.fromisoformat(data["date"]) if data.get("date") else None,
-        time=data["time"],
-        notes=data["notes"],
+        time=data.get("time"),
+        notes=data.get("notes"),
         destination_id=destination_id
     )   
     db.session.add(new_activity)
     db.session.commit()
     
     return jsonify(new_activity.serialize()), 201
+
+@api.route('/destinations/<int:destination_id>/activities', methods=['GET'])
+@jwt_required()
+def get_activities(destination_id):
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "Destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este destino"}), 403
+    activities = Activity.query.filter_by(destination_id = destination_id).all()
+    return jsonify([activity.serialize() for activity in activities]), 200
