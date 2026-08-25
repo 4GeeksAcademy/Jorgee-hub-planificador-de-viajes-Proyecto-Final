@@ -2,7 +2,7 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Trip, Destination, Activity, Place
+from api.models import db, User, Trip, Destination, Activity, Place, Favorite
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -314,3 +314,18 @@ def get_place(place_id):
     if not place:
         return jsonify({"error": "Lugar no encontrado"}), 404
     return jsonify(place.serialize()), 200
+
+@api.route('/places/<int:place_id>/favorites', methods=['POST'])
+@jwt_required()
+def create_favorite(place_id):
+    place = Place.query.get(place_id)
+    if not place: 
+        return jsonify({"error": "Lugar no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    existing_favorite = Favorite.query.filter_by(user_id=current_user_id, place_id=place_id).first()
+    if existing_favorite:
+        return jsonify({"error": "Ya tienes este lugar en tus favoritos"}), 409
+    new_favorite = Favorite(user_id=current_user_id, place_id=place_id)
+    db.session.add(new_favorite)
+    db.session.commit()
+    return jsonify(new_favorite.serialize()), 201
