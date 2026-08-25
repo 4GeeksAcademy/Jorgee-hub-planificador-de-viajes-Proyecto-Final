@@ -2,12 +2,13 @@
 This module takes care of starting the API Server, Loading the DB and Adding the endpoints
 """
 from flask import Flask, request, jsonify, url_for, Blueprint
-from api.models import db, User, Trip
+from api.models import db, User, Trip, Destination, Activity
 from api.utils import generate_sitemap, APIException
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (create_access_token, JWTManager, jwt_required, get_jwt_identity)
 from datetime import date
+from sqlalchemy import or_
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -47,7 +48,7 @@ def signup():
 @api.route('/login', methods=['POST'])
 def login():
     data = request.json
-    existing_user = User.query.filter_by(email=data["email"]).first()
+    existing_user = User.query.filter(or_(User.email == data["identifier"], User.username == data["identifier"])).first()
     if not existing_user:
         return jsonify({"error": "Credenciales inválidas"}), 401
     if not check_password_hash(existing_user.password_hash, data["password"]):
@@ -129,3 +130,96 @@ def delete_trip(trip_id):
     db.session.delete(trip)
     db.session.commit()
     return jsonify({"message": f"Viaje '{trip_name}' eliminado correctamente"}), 200
+
+@api.route('/trips/<int:trip_id>/itinerary', methods=['GET'])
+@jwt_required()
+def get_itinerary(trip_id):
+    trip = Trip.query.get(trip_id)
+    if not trip:
+        return jsonify({"error": "Viaje no encontrado"}), 404
+    
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    
+    date_param = request.args.get("date")
+    date_converted = date.fromisoformat(date_param) if date_param else None
+    activities = Activity.query.join(Destination).filter(
+        Destination.trip_id == trip_id,
+        Activity.date == date_converted
+    ).order_by(Activity.time).all()
+    return jsonify([activity.serialize() for activity in activities]), 200
+
+@api.route('/destinations/<int:destination_id>', methods=['GET'])
+@jwt_required()
+def get_destination(destination_id):
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "Destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este destino"}), 403
+    
+    return jsonify(destination.serialize()), 200
+
+
+@api.route('/trips/<int:trip_id>/destinations', methods=['POST'])
+@jwt_required()
+def create_destination(trip_id):
+    data = request.json
+    trip = Trip.query.get(trip_id)
+    if not trip:
+        return jsonify ({"error": "Viaje no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    new_destination = Destination(
+            name= data["name"],
+            country= data["country"],
+            trip_id= trip_id
+        )
+    db.session.add(new_destination)
+    db.session.commit()
+    return jsonify(new_destination.serialize()), 201
+
+@api.route('/trips/<int:trip_id>/destinations', methods=['GET'])
+@jwt_required()
+def get_destinations(trip_id):
+    trip= Trip.query.get(trip_id)
+    if not trip:
+        return jsonify({"error": "Viaje no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    destinations = Destination.query.filter_by(trip_id= trip_id).all()
+    return jsonify([destination.serialize() for destination in destinations]), 200
+
+
+@api.route('/destinations/<int:destination_id>', methods=['PUT'])
+@jwt_required()
+def update_destination(destination_id):
+    data = request.json
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+    destination.name = data.get("name", destination.name)
+    destination.country = data.get("country", destination.country)
+    db.session.commit()
+    return jsonify(destination.serialize()), 200
+
+@api.route('/destinations/<int:destination_id>', methods=['DELETE']) #Borrar un destino
+@jwt_required()
+def delete_destination(destination_id):
+    destination = Destination.query.get(destination_id)
+    if not destination:
+        return jsonify({"error": "destino no encontrado"}), 404
+    current_user_id = get_jwt_identity()
+    if str(destination.trip.user_id) != current_user_id:
+        return jsonify ({"error": "No tienes permisos sobre este destino"}), 403
+    destination_name = destination.name
+    db.session.delete(destination)
+    db.session.commit()
+    return jsonify({"message": f"Destino '{destination_name}' eliminado correctamente"}), 200
