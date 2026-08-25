@@ -329,3 +329,11 @@ def create_favorite(place_id):
     db.session.add(new_favorite)
     db.session.commit()
     return jsonify(new_favorite.serialize()), 201
+
+@api.route('/favorites', methods=['GET'])
+@jwt_required()
+def get_favorites():
+    current_user_id = get_jwt_identity()
+    favorites = Favorite.query.filter_by(user_id=current_user_id).all()
+    return jsonify([favorite.serialize() for favorite in favorites]), 200
+
