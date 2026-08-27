@@ -1,5 +1,8 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import { useRevealOnScroll } from "../hooks/useRevealOnScroll"
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
 import buenosAires from "../assets/buenos-aires-argentina.jpg";
 import lima from "../assets/lima-peru.jpg";
 import rio from "../assets/rio-de-janeiro-brasil.jpg";
@@ -100,6 +103,23 @@ const TarjetaDestino = ({ destination, large = false }) => {
 export const Home = () => {
   const navigate = useNavigate();
   const [activeDestination, setActiveDestination] = useState(0);
+  const heroRef = useRef(null)
+  const destinationSelectionRef = useRef(null)
+
+  useGSAP(()=>{
+    gsap.from(".hero-left", {
+      x: -210,
+      opacity: 0,
+      duration: 1.5,
+      ease: "power3.out"
+    })
+    gsap.from(".hero-right", {
+      x: 210,
+      opacity: 0,
+      duration: 1.5,
+      ease: "power3.out"
+    })
+  }, {scope: heroRef})
 
   useEffect(() => {
     const interval = window.setInterval(() => {
@@ -109,19 +129,26 @@ export const Home = () => {
     return () => window.clearInterval(interval);
   }, []);
 
+  useRevealOnScroll(destinationSelectionRef, "left", {
+    distance: 520,
+    duration: 1.7,
+    start: "top 80%"
+  })
+
   return (
     <main style={{ backgroundColor: "#FFFFFF", color: "#12343B" }}>
       {/* Hero */}
       <section
         className="container-fluid px-0"
         style={{ minHeight: "calc(100vh - 77px)" }}
+        ref={heroRef}
       >
         <div
           className="row g-0 align-items-stretch"
           style={{ minHeight: "calc(100vh - 77px)" }}
         >
           <div
-            className="col-lg-6 d-flex align-items-center"
+            className="col-lg-6 d-flex align-items-center hero-left"
             style={{ backgroundColor: "#EAF7FA" }}
           >
             <div
@@ -164,7 +191,7 @@ export const Home = () => {
           </div>
 
           <div
-            className="col-lg-6 position-relative overflow-hidden"
+            className="col-lg-6 position-relative overflow-hidden hero-right"
             style={{ minHeight: "520px" }}
           >
             <div
@@ -270,6 +297,7 @@ export const Home = () => {
         id="destinos"
         className="container-fluid px-0 pb-5 pb-lg-6"
         style={{ backgroundColor: "#EAF7FA" }}
+        ref={destinationSelectionRef}
       >
         <div className="container pt-5">
           <div className="d-flex justify-content-between align-items-end mb-4 gap-3">

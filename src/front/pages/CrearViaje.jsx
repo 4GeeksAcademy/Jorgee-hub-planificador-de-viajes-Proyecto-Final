@@ -78,7 +78,7 @@ export const CrearViaje = () => {
 			if (!respuesta.ok) {
 				throw new Error(datos.error || "No fue posible crear el viaje.");
 			}
-
+			
 			setExito("Tu viaje fue creado correctamente.");
 			setFormulario({ name: "", start_date: "", end_date: "" });
 		} catch (errorDeRed) {
