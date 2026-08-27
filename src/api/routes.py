@@ -295,7 +295,7 @@ def delete_activity(activity_id):
         return jsonify({"error": "Actividad no encontrada"}), 404
     current_user_id = get_jwt_identity()
     if str(activity.destination.trip.user_id) != current_user_id:
-        return jsonify({"error": "No tienes permisos sobre este viaje"}), 403
+        return jsonify({"error": "No tienes permisos sobre esta actividad"}), 403
     activity_name = activity.name
     db.session.delete(activity)
     db.session.commit()
