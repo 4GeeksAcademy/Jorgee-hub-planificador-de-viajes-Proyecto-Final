@@ -47,15 +47,37 @@ def signup():
 
 @api.route('/login', methods=['POST'])
 def login():
-    data = request.json
-    existing_user = User.query.filter(or_(User.email == data["identifier"], User.username == data["identifier"])).first()
-    if not existing_user:
-        return jsonify({"error": "Credenciales inválidas"}), 401
-    if not check_password_hash(existing_user.password_hash, data["password"]):
-        return jsonify({"error": "Credenciales inválidas"}), 401
-    access_token = create_access_token(identity=str(existing_user.id))
-    return jsonify({"token": access_token, "user": existing_user.serialize()}), 200
+    data = request.get_json()
+    
+    identifier = data.get("identifier") or data.get("email") or data.get("username")
+    password = data.get("password")
 
+    if not identifier or not password:
+        return jsonify({"msg": "Falta el identificador (email/usuario) o la contraseña"}), 400
+
+    existing_user = User.query.filter(
+        or_(User.email == identifier, User.username == identifier)
+    ).first()
+
+    if not existing_user:
+        return jsonify({"msg": "El usuario o la contraseña son incorrectos"}), 404
+
+    if not check_password_hash(existing_user.password_hash, password):
+        return jsonify({"msg": "El usuario o la contraseña son incorrectos"}), 401
+
+    access_token = create_access_token(identity=str(existing_user.id))
+
+    return jsonify({
+        "msg": "Inicio de sesión exitoso",
+        "token": access_token,
+        "user": {
+            "id": existing_user.id,
+            "username": existing_user.username,
+            "email": existing_user.email
+        }
+    }), 200
+
+    
 @api.route('/private', methods=['GET'])
 @jwt_required()
 def private():
