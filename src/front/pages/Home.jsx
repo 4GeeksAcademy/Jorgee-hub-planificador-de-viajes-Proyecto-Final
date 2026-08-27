@@ -185,7 +185,7 @@ export const Home = () => {
               </p>
               <div className="d-flex flex-wrap gap-3">
                 <Boton onClick={() => navigate("/trips/new")}>Crear mi viaje</Boton>
-                <Boton>Explorar destinos</Boton>
+                <Boton onClick={() => navigate("/explorar")}>Explorar destinos</Boton>
               </div>
             </div>
           </div>
@@ -326,6 +326,7 @@ export const Home = () => {
             <button
               type="button"
               className="d-none d-md-inline text-decoration-none fw-semibold border-0 bg-transparent p-0"
+              onClick={() => navigate("/explorar")}
               style={{ color: "#0F6B78" }}
             >
               Ver todos los destinos <span aria-hidden="true">→</span>

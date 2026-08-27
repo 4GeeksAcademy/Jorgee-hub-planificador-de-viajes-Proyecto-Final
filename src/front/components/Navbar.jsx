@@ -62,13 +62,13 @@ export const Navbar = () => {
 				>
 					<ul className="navbar-nav ms-auto align-items-lg-center gap-lg-4">
 						<li className="nav-item">
-							<a
+							<Link
+								to="/explorar"
 								className="nav-link"
-								href="#destinos"
 								style={{ color: "#D4F0F5" }}
 							>
 								Explorar
-							</a>
+							</Link>
 						</li>
 						<li className="nav-item">
 							<Link
