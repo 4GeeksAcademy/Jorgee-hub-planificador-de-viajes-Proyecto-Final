@@ -56,7 +56,7 @@ export const router = createBrowserRouter(
 				<Route path="/trips" element={<MisViajes />} />
 				
 				{/* Resolver la coincidencia exacta de redirección tras crear el viaje */}
-				<Route path="/viaje/:tripId" element={<DetalleViaje />} />
+				<Route path="/trips/:tripId" element={<DetalleViaje />} />
 			</Route>
 		</Route>
 	)

@@ -5,6 +5,7 @@ import {
 	validarFechasViaje,
 	validarFechaInicioViaje,
 } from "../utils/viajes.mjs";
+import React from "react";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",

@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ModalConfirmacionEliminacion } from "../components/ModalConfirmacionEliminacion";
 import { formatearFechaViaje, validarFechasViaje } from "../utils/viajes.mjs";
+import React from "react";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
