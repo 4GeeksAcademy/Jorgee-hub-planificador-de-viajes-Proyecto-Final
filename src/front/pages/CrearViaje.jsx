@@ -79,8 +79,23 @@ export const CrearViaje = () => {
 				throw new Error(datos.error || "No fue posible crear el viaje.");
 			}
 			
-			setExito("Tu viaje fue creado correctamente.");
+			setExito("Tu viaje fue creado correctamente. Redirigiendo...");
 			setFormulario({ name: "", start_date: "", end_date: "" });
+
+			// Evaluar la respuesta del backend para capturar el ID del viaje
+			if (datos.id || (datos.trip && datos.trip.id)) {
+				const viajeId = datos.id || datos.trip.id;
+				// Redirigir dinámicamente a la vista detallada del viaje creado
+				setTimeout(() => {
+					navigate(`/viaje/${viajeId}`);
+				}, 1500);
+			} else {
+				// Respaldo de navegación en caso de que la API no devuelva un ID
+				setTimeout(() => {
+					navigate("/");
+				}, 1500);
+			}
+
 		} catch (errorDeRed) {
 			setError(errorDeRed.message || "No fue posible conectar con el servidor.");
 		} finally {
