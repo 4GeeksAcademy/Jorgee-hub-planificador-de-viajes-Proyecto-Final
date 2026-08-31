@@ -6,20 +6,20 @@ import { useSplitEntrance } from "../hooks/useSplitEntrance";
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
 	fontWeight: 600,
-	color: "#12343B",
+	color: "#12343B"
 };
 
 const estiloEtiqueta = {
 	color: "#078A9A",
 	letterSpacing: "0.14em",
-	fontSize: "0.75rem",
+	fontSize: "0.75rem"
 };
 
 const estiloInput = {
 	border: "1px solid #B8DCE3",
 	borderRadius: 0,
 	color: "#12343B",
-	padding: "0.75rem 0.9rem",
+	padding: "0.75rem 0.9rem"
 };
 
 export const Login = () => {
@@ -43,7 +43,7 @@ export const Login = () => {
 			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/login`, {
 				method: "POST",
 				headers: { "Content-Type": "application/json" },
-				body: JSON.stringify(formulario),
+				body: JSON.stringify(formulario)
 			});
 
 			const datos = await respuesta.json();
