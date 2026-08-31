@@ -1,5 +1,3 @@
-// Import necessary components and functions from react-router-dom.
-
 import {
 	createBrowserRouter,
 	createRoutesFromElements,
@@ -20,12 +18,13 @@ import { Ciudad } from "./pages/Ciudad";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
+		// Definir la raíz del proyecto inyectando el diseño base global de la aplicación
 		<Route
 			path="/"
 			element={<Layout />}
 			errorElement={<h1>Not found!</h1>}
 		>
-			{/* Rutas principales */}
+			{/* Habilitar la ruta raíz para cargar la pantalla de bienvenida */}
 			<Route path="/" element={<Home />} />
 			<Route path="/dev/animaciones" element={<AnimacionesDev />} />
 			<Route path="/explorar" element={<Explorar />} />
@@ -33,9 +32,16 @@ export const router = createBrowserRouter(
 			<Route path="/login" element={<Login />} />
 			<Route path="/register" element={<Register />} />
 			<Route path="/recuperacion" element={<RecuperarContr />} />
+			
+			{/* Anidar rutas bajo el validador de sesiones privadas obligatorias */}
 			<Route element={<RutaProtegida />}>
+				{/* Cargar el formulario para dar de alta nuevas aventuras */}
 				<Route path="/trips/new" element={<CrearViaje />} />
+				
+				{/* Desplegar la lista con la totalidad de itinerarios del usuario */}
 				<Route path="/trips" element={<MisViajes />} />
+				
+				{/* Resolver la coincidencia exacta de redirección tras crear el viaje */}
 				<Route path="/trips/:tripId" element={<DetalleViaje />} />
 			</Route>
 		</Route>
