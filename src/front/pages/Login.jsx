@@ -1,6 +1,6 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { obtenerMensajeErrorInicioSesion } from "../utils/autenticacion.mjs";
+import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 import { useSplitEntrance } from "../hooks/useSplitEntrance";
 
 const estiloTitulo = {
@@ -24,7 +24,7 @@ const estiloInput = {
 
 export const Login = () => {
 	const navigate = useNavigate();
-	const [formulario, setFormulario] = useState({ email: "", password: "" });
+	const [formulario, setFormulario] = useState({ identifier: "", password: "" });
 	const [cargando, setCargando] = useState(false);
 	const [error, setError] = useState("");
 	const layoutRef = useRef(null)
@@ -49,7 +49,7 @@ export const Login = () => {
 			const datos = await respuesta.json();
 
 			if (!respuesta.ok) {
-				throw new Error(obtenerMensajeErrorInicioSesion(respuesta.status, datos.error));
+				throw new Error(obtenerMensajeErrorBackend(datos, "No fue posible iniciar sesión."));
 			}
 
 			localStorage.setItem("token", datos.token);
@@ -91,18 +91,18 @@ export const Login = () => {
 
 								<form onSubmit={manejarEnvio}>
 									<div className="mb-3">
-										<label htmlFor="login-email" className="form-label small fw-semibold" style={{ color: "#12343B" }}>
-											Correo electrónico
+										<label htmlFor="login-identifier" className="form-label small fw-semibold" style={{ color: "#12343B" }}>
+											Correo o nombre de usuario
 										</label>
 										<input
-											id="login-email"
-											name="email"
-											type="email"
+											id="login-identifier"
+											name="identifier"
+											type="text"
 											required
-											value={formulario.email}
+											value={formulario.identifier}
 											onChange={manejarCambio}
 											className="form-control"
-											placeholder="tu@email.com"
+											placeholder="tu@email.com o tu usuario"
 											style={estiloInput}
 										/>
 									</div>

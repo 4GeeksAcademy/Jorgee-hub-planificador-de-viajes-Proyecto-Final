@@ -1,6 +1,7 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useSplitEntrance } from "../hooks/useSplitEntrance";
+import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 
 const validarDatosPersonalesRegistro = (nombre, apellido) => {
 	if (!nombre.trim() || !apellido.trim()) {
@@ -82,7 +83,7 @@ export const Register = () => {
 			const datos = await respuesta.json();
 
 			if (!respuesta.ok) {
-				throw new Error(datos.error || "No fue posible crear la cuenta.");
+				throw new Error(obtenerMensajeErrorBackend(datos, "No fue posible crear la cuenta."));
 			}
 
 			setExito(datos.message || "Cuenta creada exitosamente.");

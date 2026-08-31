@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { Link, useNavigate, useParams } from "react-router-dom";
 import { ModalConfirmacionEliminacion } from "../components/ModalConfirmacionEliminacion";
+import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 import { formatearFechaViaje, validarFechasViaje } from "../utils/viajes.mjs";
 
 const estiloTitulo = {
@@ -42,7 +43,7 @@ export const DetalleViaje = () => {
 				const datos = await respuesta.json();
 
 				if (!respuesta.ok) {
-					throw new Error(datos.error || "No fue posible cargar el viaje.");
+					throw new Error(obtenerMensajeErrorBackend(datos, "No fue posible cargar el viaje."));
 				}
 
 				setViaje(datos);
@@ -90,7 +91,7 @@ export const DetalleViaje = () => {
 			const datos = await respuesta.json();
 
 			if (!respuesta.ok) {
-				throw new Error(datos.error || "No fue posible actualizar el viaje.");
+				throw new Error(obtenerMensajeErrorBackend(datos, "No fue posible actualizar el viaje."));
 			}
 
 			setViaje(datos);
@@ -114,7 +115,7 @@ export const DetalleViaje = () => {
 			const datos = await respuesta.json();
 
 			if (!respuesta.ok) {
-				throw new Error(datos.error || "No fue posible eliminar el viaje.");
+				throw new Error(obtenerMensajeErrorBackend(datos, "No fue posible eliminar el viaje."));
 			}
 
 			navigate("/trips", { state: { mensaje: "El viaje se eliminó correctamente." } });

@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { DropdownSeleccion } from "../components/DropdownSeleccion";
 import { TarjetaViaje } from "../components/TarjetaViaje";
+import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 import { ordenarViajes } from "../utils/viajes.mjs";
 
 export const MisViajes = () => {
@@ -32,7 +33,7 @@ export const MisViajes = () => {
 				const datos = await respuesta.json();
 
 				if (!respuesta.ok) {
-					throw new Error(datos.error || "No fue posible cargar tus viajes.");
+					throw new Error(obtenerMensajeErrorBackend(datos, "No fue posible cargar tus viajes."));
 				}
 
 				setViajes(datos);
