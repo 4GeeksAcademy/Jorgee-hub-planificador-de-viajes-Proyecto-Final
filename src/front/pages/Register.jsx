@@ -1,6 +1,6 @@
 import { useState, useRef } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import { useSplitEntrance } from "../hooks/useSplitEntrance";
+import { useSplitEntrance } from "../animaciones/useSplitEntrance";
 import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 
 const validarDatosPersonalesRegistro = (nombre, apellido) => {

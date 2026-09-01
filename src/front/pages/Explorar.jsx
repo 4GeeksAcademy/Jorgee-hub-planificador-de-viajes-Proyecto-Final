@@ -1,12 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { CargadorMapa } from "../animaciones/CargadorMapa";
 import { MapaCiudad } from "../components/MapaCiudad";
 import { TarjetaCiudad } from "../components/TarjetaCiudad";
-import { ciudades, GRUPOS_LUGARES, LUGAR_ESTILOS } from "../data/ciudades.mjs";
+import { ciudades, LUGAR_ESTILOS } from "../data/ciudades.mjs";
 import "../explorar.css";
-
-const LIMITE_TOTAL = Object.values(GRUPOS_LUGARES).reduce((total, grupo) => total + grupo.limit, 0);
-
 
 const estiloTitulo = {
 	color: "#12343B",
@@ -14,13 +12,52 @@ const estiloTitulo = {
 	fontWeight: 600,
 };
 
-const ESPERAS_REINTENTO_MS = [1000, 3000];
+const GRUPOS_CONSULTA = [
+	"turismo_cultura",
+	"comida",
+	"vida_nocturna",
+	"alojamiento",
+	"paseos",
+];
+const ESPERAS_REINTENTO_MS = [1500];
+const ESPERA_ENTRE_GRUPOS_MS = 500;
 
 const esperar = (milisegundos) => new Promise((resolve) => window.setTimeout(resolve, milisegundos));
 
 const esErrorTransitorio = (error) => !error.status || [429, 502, 503, 504].includes(error.status);
 
-const consultarGrupoConReintentos = async (ciudad, nombreGrupo, grupo) => {
+const obtenerMensajeError = (datos, fallback) => datos?.msg || datos?.error || fallback;
+
+const consultarGrupo = async (ciudad, grupo) => {
+	const parametros = new URLSearchParams({
+		lat: ciudad.latitude,
+		lon: ciudad.longitude,
+		grupo,
+	});
+	const respuesta = await fetch(
+		`${import.meta.env.VITE_BACKEND_URL}/api/explorar/lugares?${parametros}`,
+	);
+
+	if (!respuesta.ok) {
+		const datosError = await respuesta.json().catch(() => null);
+		const error = new Error(
+			obtenerMensajeError(
+				datosError,
+				"No pudimos cargar los lugares en este momento. Intenta nuevamente más tarde.",
+			),
+		);
+		error.status = respuesta.status;
+		throw error;
+	}
+
+	const datos = await respuesta.json();
+	return (datos.places || []).map((lugar) => ({
+		...lugar,
+		style: LUGAR_ESTILOS[lugar.category] || LUGAR_ESTILOS.attraction,
+	}));
+};
+
+const consultarGrupoConReintentos = async (ciudad, grupo) => {
 	for (let intento = 0; intento <= ESPERAS_REINTENTO_MS.length; intento += 1) {
 		try {
 			return await consultarGrupo(ciudad, grupo);
@@ -30,7 +67,7 @@ const consultarGrupoConReintentos = async (ciudad, nombreGrupo, grupo) => {
 				// eslint-disable-next-line no-console -- Diagnóstico solicitado para fallos definitivos de Overpass.
 				console.log("Overpass: grupo no cargado tras los reintentos.", {
 					ciudad: ciudad.city,
-					grupo: nombreGrupo,
+					grupo,
 					error: error.message,
 				});
 				throw error;
@@ -43,44 +80,12 @@ const consultarGrupoConReintentos = async (ciudad, nombreGrupo, grupo) => {
 	return [];
 };
 
-const consultarGrupo = async (ciudad, grupo) => {
-	const around = `around:5000,${ciudad.latitude},${ciudad.longitude}`;
-	const clauses = grupo.categorias.flatMap((categoria) => {
-		const [clave, valor] = LUGAR_ESTILOS[categoria].selector;
-		const selector = `[${clave}="${valor}"]`;
-		return [`node${selector}(${around});`, `way${selector}(${around});`];
-	});
-	const query = `[out:json][timeout:25];(${clauses.join("")});out center ${grupo.limit};`;
-	const respuesta = await fetch("https://overpass-api.de/api/interpreter", {
-		method: "POST",
-		headers: { "Content-Type": "application/x-www-form-urlencoded" },
-		body: new URLSearchParams({ data: query }),
-	});
+const unirLugares = (lugaresActuales, lugaresNuevos) => {
+	const lugaresPorId = new Map(
+		[...lugaresActuales, ...lugaresNuevos].map((lugar) => [lugar.id, lugar]),
+	);
 
-	if (!respuesta.ok) {
-		const error = new Error(`Overpass respondió con HTTP ${respuesta.status}.`);
-		error.status = respuesta.status;
-		throw error;
-	}
-
-	const datos = await respuesta.json();
-	return datos.elements
-		.map((elemento) => {
-			const categoria = grupo.categorias.find((item) => {
-				const [clave, valor] = LUGAR_ESTILOS[item].selector;
-				return elemento.tags?.[clave] === valor;
-			});
-			return {
-				id: `${elemento.type}/${elemento.id}`,
-				category: categoria || "attraction",
-				name: elemento.tags?.name || "Sin nombre",
-				latitude: elemento.lat || elemento.center?.lat || null,
-				longitude: elemento.lon || elemento.center?.lon || null,
-				address: elemento.tags?.["addr:street"] || "Dirección no disponible",
-				style: LUGAR_ESTILOS[categoria] || LUGAR_ESTILOS.attraction,
-			};
-		})
-		.filter((lugar) => lugar.name !== "Sin nombre" && lugar.latitude !== null && lugar.longitude !== null);
+	return [...lugaresPorId.values()];
 };
 
 export const Explorar = () => {
@@ -89,6 +94,7 @@ export const Explorar = () => {
 	const [lugarSeleccionado, setLugarSeleccionado] = useState(null);
 	const [estado, setEstado] = useState("idle");
 	const [error, setError] = useState("");
+	const [respuestaCorrectaRecibida, setRespuestaCorrectaRecibida] = useState(false);
 
 	useEffect(() => {
 		if (!ciudadSeleccionada) return undefined;
@@ -97,28 +103,39 @@ export const Explorar = () => {
 		setError("");
 		setLugares([]);
 		setLugarSeleccionado(null);
+		setRespuestaCorrectaRecibida(false);
 
-		Promise.allSettled(
-			Object.entries(GRUPOS_LUGARES).map(([nombreGrupo, grupo]) => (
-				consultarGrupoConReintentos(ciudadSeleccionada, nombreGrupo, grupo)
-			)),
-		)
+		const consultas = GRUPOS_CONSULTA.map((grupo, indice) => (
+			esperar(indice * ESPERA_ENTRE_GRUPOS_MS)
+				.then(() => {
+					if (!activa) return [];
+
+					return consultarGrupoConReintentos(ciudadSeleccionada, grupo);
+				})
+				.then((lugaresDelGrupo) => {
+					if (!activa) return lugaresDelGrupo;
+
+					setRespuestaCorrectaRecibida(true);
+					setEstado("success");
+					setLugares((lugaresActuales) => unirLugares(lugaresActuales, lugaresDelGrupo));
+
+					return lugaresDelGrupo;
+				})
+		),
+		);
+
+		Promise.allSettled(consultas)
 			.then((resultados) => {
 				if (!activa) return;
 				const respuestasCorrectas = resultados
 					.filter((resultado) => resultado.status === "fulfilled")
 					.flatMap((resultado) => resultado.value);
-				const hayFallos = resultados.some((resultado) => resultado.status === "rejected");
-				const unicos = [...new Map(respuestasCorrectas.map((lugar) => [lugar.id, lugar])).values()];
-				setLugares(unicos.slice(0, LIMITE_TOTAL));
+				const primerError = resultados.find((resultado) => resultado.status === "rejected")?.reason;
 
-				if (unicos.length) {
-					setEstado("success");
-					return;
-				}
+				if (respuestasCorrectas.length) return;
 
-				if (hayFallos) {
-					setError("No pudimos cargar los lugares en este momento. Intenta nuevamente más tarde.");
+				if (primerError) {
+					setError(primerError.message || "No pudimos cargar los lugares en este momento. Intenta nuevamente más tarde.");
 					setEstado("error");
 					return;
 				}
@@ -130,6 +147,11 @@ export const Explorar = () => {
 	}, [ciudadSeleccionada]);
 
 	const lugaresConSeleccion = lugares;
+	const mostrarCargador = (
+		estado === "loading"
+		&& !respuestaCorrectaRecibida
+		&& lugares.length === 0
+	);
 
 	return (
 		<main className="explorar-page" style={{ backgroundColor: "#EAF7FA" }}>
@@ -168,6 +190,7 @@ export const Explorar = () => {
 								lugarSeleccionado={lugarSeleccionado}
 								onLugarClick={setLugarSeleccionado}
 							/>
+							{mostrarCargador && <CargadorMapa />}
 							{lugarSeleccionado && (
 								<article className="explorar-lugar-detalle" aria-live="polite">
 									<div><p className="small text-uppercase fw-semibold mb-1" style={{ color: lugarSeleccionado.style.color, letterSpacing: "0.1em" }}>{lugarSeleccionado.style.label}</p><h3 className="h4 mb-2" style={estiloTitulo}>{lugarSeleccionado.name}</h3><p className="mb-0" style={{ color: "#456B75" }}>{lugarSeleccionado.address}</p></div>

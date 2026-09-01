@@ -1,13 +1,13 @@
 import { useEffect, useState, useRef } from "react";
 import { useNavigate } from "react-router-dom";
-import { useRevealOnScroll } from "../hooks/useRevealOnScroll"
+import { useRevealOnScroll } from "../animaciones/useRevealOnScroll"
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import buenosAires from "../assets/buenos-aires-argentina.jpg";
-import lima from "../assets/lima-peru.jpg";
-import rio from "../assets/rio-de-janeiro-brasil.jpg";
-import sanJose from "../assets/san-jose-costa-rica.jpg";
-import valparaiso from "../assets/valparaiso-chile.jpg";
+import buenosAires from "../assets/img/buenos-aires-argentina.jpg";
+import lima from "../assets/img/lima-peru.jpg";
+import rio from "../assets/img/rio-de-janeiro-brasil.jpg";
+import sanJose from "../assets/img/san-jose-costa-rica.jpg";
+import valparaiso from "../assets/img/valparaiso-chile.jpg";
 
 const destinations = [
   { city: "Valparaíso", country: "Chile", image: valparaiso },

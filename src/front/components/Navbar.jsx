@@ -1,10 +1,19 @@
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
+import { useEntradaDesdeArriba } from "../animaciones/useEntradaDesdeArriba";
 import { cerrarSesion } from "../utils/autenticacion.mjs";
 
 export const Navbar = () => {
 	const navigate = useNavigate();
+	const navbarRef = useRef(null);
 	const [sesionActiva, setSesionActiva] = useState(() => Boolean(localStorage.getItem("token")));
+
+	useEntradaDesdeArriba(navbarRef, {
+		delay: 0,
+		opacity: 0,
+		position: -96,
+		tiempo: 0.65,
+	});
 
 	useEffect(() => {
 		const actualizarSesion = () => {
@@ -26,6 +35,7 @@ export const Navbar = () => {
 
 	return (
 		<nav
+			ref={navbarRef}
 			className="navbar navbar-expand-lg py-3 sticky-top"
 			style={{
 				backgroundColor: "#12343B",
