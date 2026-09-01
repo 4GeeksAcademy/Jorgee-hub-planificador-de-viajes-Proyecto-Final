@@ -8,17 +8,17 @@ import React from "react";
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
 	color: "#12343B",
-	fontWeight: 600,
+	fontWeight: 600
 };
 
 const estiloInput = {
 	border: "1px solid #B8DCE3",
 	borderRadius: 0,
-	color: "#12343B",
+	color: "#12343B"
 };
 
 export const DetalleViaje = () => {
-	const { tripId } = useParams();
+	const { id } = useParams();
 	const navigate = useNavigate();
 	const [viaje, setViaje] = useState(null);
 	const [formulario, setFormulario] = useState(null);
@@ -38,7 +38,7 @@ export const DetalleViaje = () => {
 			}
 
 			try {
-				const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${tripId}`, {
+				const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
 					headers: { Authorization: `Bearer ${token}` },
 				});
 				const datos = await respuesta.json();
@@ -57,7 +57,7 @@ export const DetalleViaje = () => {
 		};
 
 		cargarViaje();
-	}, [tripId]);
+	}, [id]);
 
 	const manejarCambio = (event) => {
 		const { name, value } = event.target;
@@ -77,7 +77,7 @@ export const DetalleViaje = () => {
 
 		setGuardando(true);
 		try {
-			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${tripId}`, {
+			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
@@ -109,7 +109,7 @@ export const DetalleViaje = () => {
 		setError("");
 		setGuardando(true);
 		try {
-			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${tripId}`, {
+			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
 				method: "DELETE",
 				headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 			});
@@ -165,7 +165,6 @@ export const DetalleViaje = () => {
 							{viaje.name}
 						</h1>
 
-						{/* Resumen guardado */}
 						<div className="row g-4 mb-5">
 							<div className="col-md-6">
 								<p className="small mb-1" style={{ color: "#456B75" }}>Inicio</p>
@@ -177,7 +176,6 @@ export const DetalleViaje = () => {
 							</div>
 						</div>
 
-						{/* Edición del viaje */}
 						<form onSubmit={guardarCambios} className="border-top pt-4">
 							<h2 className="h3 mb-4" style={estiloTitulo}>Editar viaje</h2>
 							<div className="row g-3">
@@ -199,7 +197,6 @@ export const DetalleViaje = () => {
 							</button>
 						</form>
 
-						{/* Eliminación del viaje */}
 						<div className="border-top pt-4 mt-5">
 							<h2 className="h3 mb-2" style={estiloTitulo}>Eliminar viaje</h2>
 							<p style={{ color: "#456B75" }}>

@@ -1,7 +1,7 @@
 import {
 	createBrowserRouter,
 	createRoutesFromElements,
-	Route,
+	Route
 } from "react-router-dom";
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
@@ -42,7 +42,7 @@ export const router = createBrowserRouter(
 				<Route path="/trips" element={<MisViajes />} />
 				
 				{/* Resolver la coincidencia exacta de redirección tras crear el viaje */}
-				<Route path="/trips/:tripId" element={<DetalleViaje />} />
+				<Route path="/trips/:id" element={<DetalleViaje />} />
 			</Route>
 		</Route>
 	)
