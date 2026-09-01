@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
-import { useSplitEntrance } from "../hooks/useSplitEntrance";
+import { useSplitEntrance } from "../animaciones/useSplitEntrance";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
