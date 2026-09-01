@@ -88,7 +88,7 @@ export const CrearViaje = () => {
 				const viajeId = datos.id || datos.trip.id;
 				// Redirigir dinámicamente a la vista detallada del viaje creado
 				setTimeout(() => {
-					navigate(`/viaje/${viajeId}`);
+					navigate(`/trips/${viajeId}`);
 				}, 1500);
 			} else {
 				// Respaldo de navegación en caso de que la API no devuelva un ID
@@ -123,7 +123,7 @@ export const CrearViaje = () => {
 									style={{
 										color: "#078A9A",
 										letterSpacing: "0.14em",
-										fontSize: "0.75rem",
+										fontSize: "0.75rem"
 									}}
 								>
 									Tu próxima aventura
@@ -232,7 +232,7 @@ export const CrearViaje = () => {
 										style={{
 											backgroundColor: "#12343B",
 											color: "#FFFFFF",
-											borderRadius: 0,
+											borderRadius: 0
 										}}
 									>
 										{cargando ? "Creando viaje..." : "Crear viaje"}
@@ -268,7 +268,7 @@ export const CrearViaje = () => {
 										style={{
 											color: "#28C3D4",
 											letterSpacing: "0.14em",
-											fontSize: "0.75rem",
+											fontSize: "0.75rem"
 										}}
 									>
 										Un itinerario a tu medida
