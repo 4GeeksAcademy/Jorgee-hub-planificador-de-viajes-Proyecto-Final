@@ -5,7 +5,7 @@ import {
 	validarFechasViaje,
 	validarFechaInicioViaje,
 } from "../utils/viajes.mjs";
-import React from "react";
+import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
@@ -77,7 +77,7 @@ export const CrearViaje = () => {
 			const datos = await respuesta.json();
 
 			if (!respuesta.ok) {
-				throw new Error(datos.error || "No fue posible crear el viaje.");
+				throw new Error(obtenerMensajeErrorBackend(datos, "No fue posible crear el viaje."));
 			}
 			
 			setExito("Tu viaje fue creado correctamente. Redirigiendo...");
