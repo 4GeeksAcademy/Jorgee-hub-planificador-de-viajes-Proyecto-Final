@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useEntradaDesdeArriba } from "../animaciones/useEntradaDesdeArriba";
 import { cerrarSesion } from "../utils/autenticacion.mjs";
@@ -6,7 +6,9 @@ import { cerrarSesion } from "../utils/autenticacion.mjs";
 export const Navbar = () => {
 	const navigate = useNavigate();
 	const navbarRef = useRef(null);
+	const botonMenuRef = useRef(null);
 	const [sesionActiva, setSesionActiva] = useState(() => Boolean(localStorage.getItem("token")));
+	const [menuAbierto, setMenuAbierto] = useState(false);
 
 	useEntradaDesdeArriba(navbarRef, {
 		delay: 0,
@@ -27,16 +29,33 @@ export const Navbar = () => {
 		};
 	}, []);
 
+	const cerrarMenu = useCallback(() => {
+		setMenuAbierto(false);
+		botonMenuRef.current?.focus();
+	}, []);
+
+	useEffect(() => {
+		if (!menuAbierto) return undefined;
+
+		const manejarTecla = (evento) => {
+			if (evento.key === "Escape") cerrarMenu();
+		};
+
+		document.addEventListener("keydown", manejarTecla);
+		return () => document.removeEventListener("keydown", manejarTecla);
+	}, [menuAbierto, cerrarMenu]);
+
 	const manejarCierreSesion = () => {
 		cerrarSesion(localStorage);
 		setSesionActiva(false);
+		cerrarMenu();
 		navigate("/");
 	};
 
 	return (
 		<nav
 			ref={navbarRef}
-			className="navbar navbar-expand-lg py-3 sticky-top"
+			className={`navbar navbar-expand-lg py-3 sticky-top${menuAbierto ? " navbar-menu-abierto" : ""}`}
 			style={{
 				backgroundColor: "#12343B",
 				zIndex: 1020,
@@ -56,25 +75,50 @@ export const Navbar = () => {
 				>
 					Viajero
 				</Link>
-				<button
-					className="navbar-toggler"
-					type="button"
-					data-bs-toggle="collapse"
-					data-bs-target="#mainNavigation"
-					aria-controls="mainNavigation"
-					aria-label="Abrir navegación"
-				>
-					<span className="navbar-toggler-icon" />
-				</button>
+				{!menuAbierto && (
+					<button
+						ref={botonMenuRef}
+						className="navbar-toggler"
+						type="button"
+						aria-controls="mainNavigation"
+						aria-expanded={menuAbierto}
+						aria-label="Abrir navegación"
+						onClick={() => setMenuAbierto(true)}
+					>
+						<i className="fa-solid fa-bars" aria-hidden="true" />
+					</button>
+				)}
+				{menuAbierto && (
+					<button
+						className="navegacion-movil-fondo"
+						type="button"
+						aria-label="Cerrar menú"
+						onClick={cerrarMenu}
+					/>
+				)}
 				<div
-					className="collapse navbar-collapse"
+					className={`offcanvas offcanvas-end navegacion-movil-panel${menuAbierto ? " show" : ""}`}
 					id="mainNavigation"
+					aria-labelledby="mainNavigationTitle"
+					aria-hidden={!menuAbierto}
 				>
+					<h2 id="mainNavigationTitle" className="visually-hidden">
+						Navegación principal
+					</h2>
+					<button
+						className="navegacion-movil-cerrar"
+						type="button"
+						aria-label="Cerrar navegación"
+						onClick={cerrarMenu}
+					>
+						<i className="fa-solid fa-xmark" aria-hidden="true" />
+					</button>
 					<ul className="navbar-nav ms-auto align-items-lg-center gap-lg-4">
 						<li className="nav-item">
 							<Link
 								to="/explorar"
 								className="nav-link"
+								onClick={cerrarMenu}
 								style={{ color: "#D4F0F5" }}
 							>
 								Explorar
@@ -84,6 +128,7 @@ export const Navbar = () => {
 							<Link
 								to="/trips"
 								className="nav-link"
+								onClick={cerrarMenu}
 								style={{ color: "#D4F0F5" }}
 							>
 								Mis viajes
@@ -92,6 +137,7 @@ export const Navbar = () => {
 						<li className="nav-item">
 							<a
 								className="nav-link"
+								onClick={cerrarMenu}
 								href="#footer"
 								style={{ color: "#D4F0F5" }}
 							>

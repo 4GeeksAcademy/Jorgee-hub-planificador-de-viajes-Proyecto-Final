@@ -155,7 +155,7 @@ export const Explorar = () => {
   const [lugarSeleccionado, setLugarSeleccionado] = useState(null);
   const [estado, setEstado] = useState("idle");
   const [error, setError] = useState("");
-  const [gruposRespondidos, setGruposRespondidos] = useState(0);
+  const [respuestaCorrectaRecibida, setRespuestaCorrectaRecibida] = useState(false);
   const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
   const [estadoDireccion, setEstadoDireccion] = useState("idle");
 
@@ -195,7 +195,7 @@ export const Explorar = () => {
     setError("");
     setLugares([]);
     setLugarSeleccionado(null);
-    setGruposRespondidos(0);
+    setRespuestaCorrectaRecibida(false);
 
     const puntosConsulta = obtenerPuntosConsulta(ciudadSeleccionada);
 
@@ -217,16 +217,12 @@ export const Explorar = () => {
           .then((lugaresDelGrupo) => {
             if (!activa) return lugaresDelGrupo;
 
+            setRespuestaCorrectaRecibida(true);
             setLugares((lugaresActuales) =>
               unirLugares(lugaresActuales, lugaresDelGrupo),
             );
 
             return lugaresDelGrupo;
-          })
-          .finally(() => {
-            if (activa) {
-              setGruposRespondidos((actual) => actual + 1);
-            }
           }),
       ),
     );
@@ -265,7 +261,7 @@ export const Explorar = () => {
     };
   }, [ciudadSeleccionada]);
 
-  const mostrarCargador = estado === "loading" && gruposRespondidos < 3;
+  const mostrarCargador = estado === "loading" && !respuestaCorrectaRecibida;
   const direccionMostrada =
     direccionSeleccionada?.address || lugarSeleccionado?.address || "Dirección no disponible";
   const ciudadMostrada = direccionSeleccionada?.city || lugarSeleccionado?.city;
@@ -308,7 +304,7 @@ export const Explorar = () => {
           <section className="col-lg-6 explorar-mapa-panel">
             <div className="explorar-mapa-wrapper">
               <MapaCiudad
-                altura="620px"
+                altura="100%"
                 ciudad={ciudadSeleccionada}
                 lugares={lugares}
                 lugarSeleccionado={lugarSeleccionado}
