@@ -179,11 +179,46 @@
 	display: flex;
 	align-items: flex-start;
 	justify-content: space-between;
-	gap: 1rem;
-	padding: 1rem 1.25rem;
+	gap: 1.25rem;
+	padding: 1.15rem 1.35rem;
 	background-color: #FFFFFF;
 	border-left: 4px solid #28C3D4;
 	box-shadow: 0 0.5rem 1.25rem rgba(18, 52, 59, 0.22);
+}
+
+.explorar-lugar-detalle-contenido {
+	min-width: 0;
+	width: 100%;
+}
+
+.explorar-lugar-detalle-categoria {
+	letter-spacing: 0.1em;
+}
+
+.explorar-lugar-detalle-datos {
+	display: grid;
+	gap: 0.45rem;
+	margin-top: 0.75rem;
+	color: #456B75;
+	font-size: 0.9rem;
+}
+
+.explorar-lugar-detalle-datos p {
+	display: grid;
+	grid-template-columns: 5.5rem 1fr;
+	gap: 0.5rem;
+}
+
+.explorar-lugar-detalle-datos strong {
+	color: #12343B;
+	font-size: 0.76rem;
+	text-transform: uppercase;
+}
+
+.explorar-lugar-detalle-fuente {
+	display: block;
+	margin-top: 0.8rem;
+	color: #6B8991;
 }
 
 .ciudad-imagen-wrapper {

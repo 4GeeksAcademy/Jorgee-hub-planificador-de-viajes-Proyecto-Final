@@ -22,6 +22,7 @@ const GRUPOS_CONSULTA = [
 
 const ESPERAS_REINTENTO_MS = [1500];
 const ESPERA_ENTRE_GRUPOS_MS = 500;
+const DISTANCIA_CENTROS_CONSULTA_KM = 5;
 
 const esperar = (milisegundos) =>
   new Promise((resolve) => window.setTimeout(resolve, milisegundos));
@@ -32,10 +33,57 @@ const esErrorTransitorio = (error) =>
 const obtenerMensajeError = (datos, fallback) =>
   datos?.msg || datos?.error || fallback;
 
-const consultarGrupo = async (ciudad, grupo) => {
+const consultarDireccion = async (lugar) => {
   const parametros = new URLSearchParams({
-    lat: ciudad.latitude,
-    lon: ciudad.longitude,
+    lat: lugar.latitude,
+    lon: lugar.longitude,
+  });
+  const respuesta = await fetch(
+    `${import.meta.env.VITE_BACKEND_URL}/api/explorar/direccion?${parametros}`,
+  );
+
+  if (!respuesta.ok) {
+    const datosError = await respuesta.json().catch(() => null);
+    throw new Error(
+      obtenerMensajeError(datosError, "No pudimos obtener la dirección."),
+    );
+  }
+
+  return respuesta.json();
+};
+
+const tieneCoordenadasValidas = (lugar) =>
+  Number.isFinite(lugar.latitude) &&
+  Number.isFinite(lugar.longitude) &&
+  lugar.latitude >= -90 &&
+  lugar.latitude <= 90 &&
+  lugar.longitude >= -180 &&
+  lugar.longitude <= 180;
+
+const obtenerPuntosConsulta = (ciudad) => {
+  const latitudEnRadianes = (ciudad.latitude * Math.PI) / 180;
+  const gradosPorKilometro = 1 / (111.32 * Math.cos(latitudEnRadianes));
+  const desplazamiento =
+    DISTANCIA_CENTROS_CONSULTA_KM * gradosPorKilometro;
+
+  return [
+    {
+      lado: "oeste",
+      latitude: ciudad.latitude,
+      longitude: ciudad.longitude - desplazamiento,
+    },
+    {
+      lado: "este",
+      latitude: ciudad.latitude,
+      longitude: ciudad.longitude + desplazamiento,
+    },
+  ];
+};
+
+const consultarGrupo = async (ciudad, grupo, puntoConsulta) => {
+  const parametros = new URLSearchParams({
+    lat: puntoConsulta.latitude,
+    lon: puntoConsulta.longitude,
     grupo,
   });
 
@@ -59,16 +107,19 @@ const consultarGrupo = async (ciudad, grupo) => {
 
   const datos = await respuesta.json();
 
-  return (datos.places || []).map((lugar) => ({
-    ...lugar,
-    style: LUGAR_ESTILOS[lugar.category] || LUGAR_ESTILOS.attraction,
-  }));
+  return (datos.places || [])
+    .filter(tieneCoordenadasValidas)
+    .map((lugar) => ({
+      ...lugar,
+      city: ciudad.city,
+      style: LUGAR_ESTILOS[lugar.category] || LUGAR_ESTILOS.attraction,
+    }));
 };
 
-const consultarGrupoConReintentos = async (ciudad, grupo) => {
+const consultarGrupoConReintentos = async (ciudad, grupo, puntoConsulta) => {
   for (let intento = 0; intento <= ESPERAS_REINTENTO_MS.length; intento += 1) {
     try {
-      return await consultarGrupo(ciudad, grupo);
+      return await consultarGrupo(ciudad, grupo, puntoConsulta);
     } catch (error) {
       const quedanReintentos = intento < ESPERAS_REINTENTO_MS.length;
 
@@ -76,6 +127,7 @@ const consultarGrupoConReintentos = async (ciudad, grupo) => {
         console.log("Overpass: grupo no cargado tras los reintentos.", {
           ciudad: ciudad.city,
           grupo,
+          lado: puntoConsulta.lado,
           error: error.message,
         });
 
@@ -104,6 +156,35 @@ export const Explorar = () => {
   const [estado, setEstado] = useState("idle");
   const [error, setError] = useState("");
   const [gruposRespondidos, setGruposRespondidos] = useState(0);
+  const [direccionSeleccionada, setDireccionSeleccionada] = useState(null);
+  const [estadoDireccion, setEstadoDireccion] = useState("idle");
+
+  useEffect(() => {
+    if (!lugarSeleccionado) {
+      setDireccionSeleccionada(null);
+      setEstadoDireccion("idle");
+      return undefined;
+    }
+
+    let activa = true;
+    setDireccionSeleccionada(null);
+    setEstadoDireccion("loading");
+
+    consultarDireccion(lugarSeleccionado)
+      .then((direccion) => {
+        if (!activa) return;
+        setDireccionSeleccionada(direccion);
+        setEstadoDireccion("success");
+      })
+      .catch(() => {
+        if (!activa) return;
+        setEstadoDireccion("error");
+      });
+
+    return () => {
+      activa = false;
+    };
+  }, [lugarSeleccionado]);
 
   useEffect(() => {
     if (!ciudadSeleccionada) return undefined;
@@ -116,27 +197,38 @@ export const Explorar = () => {
     setLugarSeleccionado(null);
     setGruposRespondidos(0);
 
-    const consultas = GRUPOS_CONSULTA.map((grupo, indice) =>
-      esperar(indice * ESPERA_ENTRE_GRUPOS_MS)
-        .then(() => {
-          if (!activa) return [];
+    const puntosConsulta = obtenerPuntosConsulta(ciudadSeleccionada);
 
-          return consultarGrupoConReintentos(ciudadSeleccionada, grupo);
-        })
-        .then((lugaresDelGrupo) => {
-          if (!activa) return lugaresDelGrupo;
+    const consultas = GRUPOS_CONSULTA.flatMap((grupo, indiceGrupo) =>
+      puntosConsulta.map((puntoConsulta, indicePunto) =>
+        esperar(
+          (indiceGrupo * puntosConsulta.length + indicePunto) *
+            ESPERA_ENTRE_GRUPOS_MS,
+        )
+          .then(() => {
+            if (!activa) return [];
 
-          setLugares((lugaresActuales) =>
-            unirLugares(lugaresActuales, lugaresDelGrupo),
-          );
+            return consultarGrupoConReintentos(
+              ciudadSeleccionada,
+              grupo,
+              puntoConsulta,
+            );
+          })
+          .then((lugaresDelGrupo) => {
+            if (!activa) return lugaresDelGrupo;
 
-          return lugaresDelGrupo;
-        })
-        .finally(() => {
-          if (activa) {
-            setGruposRespondidos((actual) => actual + 1);
-          }
-        }),
+            setLugares((lugaresActuales) =>
+              unirLugares(lugaresActuales, lugaresDelGrupo),
+            );
+
+            return lugaresDelGrupo;
+          })
+          .finally(() => {
+            if (activa) {
+              setGruposRespondidos((actual) => actual + 1);
+            }
+          }),
+      ),
     );
 
     Promise.allSettled(consultas).then((resultados) => {
@@ -174,6 +266,9 @@ export const Explorar = () => {
   }, [ciudadSeleccionada]);
 
   const mostrarCargador = estado === "loading" && gruposRespondidos < 3;
+  const direccionMostrada =
+    direccionSeleccionada?.address || lugarSeleccionado?.address || "Dirección no disponible";
+  const ciudadMostrada = direccionSeleccionada?.city || lugarSeleccionado?.city;
 
   return (
     <main className="explorar-page" style={{ backgroundColor: "#EAF7FA" }}>
@@ -218,19 +313,17 @@ export const Explorar = () => {
                 lugares={lugares}
                 lugarSeleccionado={lugarSeleccionado}
                 onLugarClick={setLugarSeleccionado}
+                onClusterClick={setLugarSeleccionado}
               />
 
               {mostrarCargador && <CargadorMapa />}
 
               {lugarSeleccionado && (
                 <article className="explorar-lugar-detalle" aria-live="polite">
-                  <div>
+                  <div className="explorar-lugar-detalle-contenido">
                     <p
-                      className="small text-uppercase fw-semibold mb-1"
-                      style={{
-                        color: lugarSeleccionado.style.color,
-                        letterSpacing: "0.1em",
-                      }}
+                      className="explorar-lugar-detalle-categoria small text-uppercase fw-semibold mb-1"
+                      style={{ color: lugarSeleccionado.style.color }}
                     >
                       {lugarSeleccionado.style.label}
                     </p>
@@ -239,14 +332,27 @@ export const Explorar = () => {
                       {lugarSeleccionado.name}
                     </h3>
 
-                    <p
-                      className="mb-0"
-                      style={{
-                        color: "#456B75",
-                      }}
-                    >
-                      {lugarSeleccionado.address}
-                    </p>
+                    <div className="explorar-lugar-detalle-datos">
+                      <p className="mb-0">
+                        <strong>Dirección</strong>
+                        <span>
+                          {estadoDireccion === "loading"
+                            ? "Buscando dirección..."
+                            : direccionMostrada}
+                        </span>
+                      </p>
+
+                      {ciudadMostrada && (
+                        <p className="mb-0">
+                          <strong>Ciudad</strong>
+                          <span>{ciudadMostrada}</span>
+                        </p>
+                      )}
+                    </div>
+
+                    <small className="explorar-lugar-detalle-fuente">
+                      {direccionSeleccionada?.source || lugarSeleccionado.source}
+                    </small>
                   </div>
 
                   <button
