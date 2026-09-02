@@ -15,6 +15,9 @@ import { RutaProtegida } from "./components/RutaProtegida";
 import { AnimacionesDev } from "./pages/AnimacionesDev";
 import { Explorar } from "./pages/Explorar";
 import { Ciudad } from "./pages/Ciudad";
+import { DestinosViaje } from "./pages/DestinosViaje";
+import { ActividadesDestino } from "./pages/ActividadesDestino";
+import { Favoritos } from "./pages/Favoritos";
 
 export const router = createBrowserRouter(
 	createRoutesFromElements(
@@ -43,6 +46,10 @@ export const router = createBrowserRouter(
 				
 				{/* Resolver la coincidencia exacta de redirección tras crear el viaje */}
 				<Route path="/trips/:id" element={<DetalleViaje />} />
+
+				<Route path="/trips/:id/destinos" element={<DestinosViaje />} />
+				<Route path="/trips/:id/destinos/:destinoId/actividades" element={<ActividadesDestino />} />
+				<Route path="/favoritos" element={<Favoritos />} />
 			</Route>
 		</Route>
 	)

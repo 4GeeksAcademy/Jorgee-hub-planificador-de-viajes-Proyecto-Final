@@ -80,13 +80,13 @@ export const Navbar = () => {
 							</Link>
 						</li>
 						<li className="nav-item">
-							<a
-								className="nav-link"
-								href="#footer"
-								style={{ color: "#D4F0F5" }}
-							>
-								Favoritos
-							</a>
+							<Link
+ 								 to="/favoritos"
+ 								 className="nav-link"
+ 								 style={{ color: "#D4F0F5" }}
+									>
+  								⭐ Favoritos
+							</Link>
 						</li>
 						<li className="nav-item dropdown">
 							<button

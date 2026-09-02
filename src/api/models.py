@@ -107,6 +107,14 @@ class Place(db.Model):
     name: Mapped[str] = mapped_column(String(120), nullable=False)
     country: Mapped[str] = mapped_column(String(120), nullable=False)
     description: Mapped[str] = mapped_column(Text)
+    slug: Mapped[str] = mapped_column(String(120), unique=True, nullable=False)
+    city: Mapped[str] = mapped_column(String(120), nullable=False)
+    region: Mapped[str] = mapped_column(String(120))
+    image: Mapped[str] = mapped_column(String(255))
+    latitude: Mapped[float] = mapped_column(nullable=True)
+    longitude: Mapped[float] = mapped_column(nullable=True)
+    best_for: Mapped[str] = mapped_column(String(255))
+    
     favorites: Mapped[List["Favorite"]] = relationship(
         back_populates="place", cascade="all, delete-orphan"
     )
@@ -114,11 +122,16 @@ class Place(db.Model):
     def serialize(self):
         return {
             "id": self.id,
-            "name": self.name,
+            "slug": self.slug,
+            "city": self.city,
             "country": self.country,
-            "description": self.description
+            "region": self.region,
+            "image": self.image,
+            "latitude": self.latitude,
+            "longitude": self.longitude,
+            "description": self.description,
+            "bestFor": self.best_for  # Nota: bestFor en frontend, best_for en backend
         }
-
 
 class Favorite(db.Model):
     __tablename__ = "favorite"
