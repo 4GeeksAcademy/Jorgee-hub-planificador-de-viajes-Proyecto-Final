@@ -1,8 +1,8 @@
-import buenosAires from "../assets/buenos-aires-argentina.jpg";
-import lima from "../assets/lima-peru.jpg";
-import rio from "../assets/rio-de-janeiro-brasil.jpg";
-import sanJose from "../assets/san-jose-costa-rica.jpg";
-import valparaiso from "../assets/valparaiso-chile.jpg";
+import buenosAires from "../assets/img/buenos-aires-argentina.jpg";
+import lima from "../assets/img/lima-peru.jpg";
+import rio from "../assets/img/rio-de-janeiro-brasil.jpg";
+import sanJose from "../assets/img/san-jose-costa-rica.jpg";
+import valparaiso from "../assets/img/valparaiso-chile.jpg";
 
 export const ciudades = [
 	{
@@ -87,21 +87,6 @@ export const LUGAR_ESTILOS = {
 	pier: { label: "Muelle", color: "#087990", icon: "fa-anchor", selector: ["man_made", "pier"] },
 	marina: { label: "Marina", color: "#0AA2C0", icon: "fa-sailboat", selector: ["leisure", "marina"] },
 	pedestrian: { label: "Paseo", color: "#997404", icon: "fa-person-walking", selector: ["highway", "pedestrian"] },
-};
-
-export const GRUPOS_LUGARES = {
-	turismo_cultura: {
-		limit: 20,
-		categorias: ["attraction", "museum", "viewpoint", "park", "monument", "gallery"],
-	},
-	comida_vida_nocturna: {
-		limit: 30,
-		categorias: ["restaurant", "cafe", "fast_food", "bar", "pub", "nightclub"],
-	},
-	alojamiento_agua: {
-		limit: 20,
-		categorias: ["hotel", "hostel", "guest_house", "pier", "marina", "pedestrian"],
-	},
 };
 
 export const obtenerCiudad = (slug) => ciudades.find((ciudad) => ciudad.slug === slug);

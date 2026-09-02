@@ -42,16 +42,22 @@ body {
 	min-height: 100vh;
 }
 
-.object-fit-cover {
-	object-fit: cover;
-}
-
 .py-lg-6 {
 	padding-top: 6rem !important;
 	padding-bottom: 6rem !important;
 }
 
 @media (max-width: 991.98px) {
+	.navbar-toggler:focus {
+		box-shadow: 0 0 0 0.2rem rgba(140, 227, 237, 0.35);
+	}
+
+	.offcanvas .dropdown-menu {
+		position: static !important;
+		width: 100%;
+		margin: 0 0 0.75rem !important;
+	}
+
 	.py-lg-6 {
 		padding-top: 4rem !important;
 		padding-bottom: 4rem !important;

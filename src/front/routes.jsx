@@ -1,7 +1,7 @@
 import {
-	createBrowserRouter,
-	createRoutesFromElements,
-	Route
+  createBrowserRouter,
+  createRoutesFromElements,
+  Route,
 } from "react-router-dom";
 import { Layout } from "./pages/Layout";
 import { Home } from "./pages/Home";
@@ -12,45 +12,37 @@ import { CrearViaje } from "./pages/CrearViaje";
 import { DetalleViaje } from "./pages/DetalleViaje";
 import { MisViajes } from "./pages/MisViajes";
 import { RutaProtegida } from "./components/RutaProtegida";
-import { AnimacionesDev } from "./pages/AnimacionesDev";
 import { Explorar } from "./pages/Explorar";
 import { Ciudad } from "./pages/Ciudad";
-import { DestinosViaje } from "./pages/DestinosViaje";
-import { ActividadesDestino } from "./pages/ActividadesDestino";
-import { Favoritos } from "./pages/Favoritos";
+import { Perfil } from "./pages/Perfil";
+import { ConfiguracionPerfil } from "./pages/ConfiguracionPerfil";
 
 export const router = createBrowserRouter(
-	createRoutesFromElements(
-		// Definir la raíz del proyecto inyectando el diseño base global de la aplicación
-		<Route
-			path="/"
-			element={<Layout />}
-			errorElement={<h1>Not found!</h1>}
-		>
-			{/* Habilitar la ruta raíz para cargar la pantalla de bienvenida */}
-			<Route path="/" element={<Home />} />
-			<Route path="/dev/animaciones" element={<AnimacionesDev />} />
-			<Route path="/explorar" element={<Explorar />} />
-			<Route path="/explorar/:citySlug" element={<Ciudad />} />
-			<Route path="/login" element={<Login />} />
-			<Route path="/register" element={<Register />} />
-			<Route path="/recuperacion" element={<RecuperarContr />} />
-			
-			{/* Anidar rutas bajo el validador de sesiones privadas obligatorias */}
-			<Route element={<RutaProtegida />}>
-				{/* Cargar el formulario para dar de alta nuevas aventuras */}
-				<Route path="/trips/new" element={<CrearViaje />} />
-				
-				{/* Desplegar la lista con la totalidad de itinerarios del usuario */}
-				<Route path="/trips" element={<MisViajes />} />
-				
-				{/* Resolver la coincidencia exacta de redirección tras crear el viaje */}
-				<Route path="/trips/:id" element={<DetalleViaje />} />
+  createRoutesFromElements(
+    // Definir la raíz del proyecto inyectando el diseño base global de la aplicación
+    <Route path="/" element={<Layout />} errorElement={<h1>Not found!</h1>}>
+      {/* Habilitar la ruta raíz para cargar la pantalla de bienvenida */}
+      <Route path="/" element={<Home />} />
+      <Route path="/explorar" element={<Explorar />} />
+      <Route path="/explorar/:citySlug" element={<Ciudad />} />
+      <Route path="/login" element={<Login />} />
+      <Route path="/register" element={<Register />} />
+      <Route path="/recuperacion" element={<RecuperarContr />} />
 
-				<Route path="/trips/:id/destinos" element={<DestinosViaje />} />
-				<Route path="/trips/:id/destinos/:destinoId/actividades" element={<ActividadesDestino />} />
-				<Route path="/favoritos" element={<Favoritos />} />
-			</Route>
-		</Route>
-	)
+      {/* Anidar rutas bajo el validador de sesiones privadas obligatorias */}
+      <Route element={<RutaProtegida />}>
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/perfil/configuracion" element={<ConfiguracionPerfil />} />
+
+        {/* Cargar el formulario para dar de alta nuevas aventuras */}
+        <Route path="/trips/new" element={<CrearViaje />} />
+
+        {/* Desplegar la lista con la totalidad de itinerarios del usuario */}
+        <Route path="/trips" element={<MisViajes />} />
+
+        {/* Resolver la coincidencia exacta de redirección tras crear el viaje */}
+        <Route path="/trips/:tripId" element={<DetalleViaje />} />
+      </Route>
+    </Route>,
+  ),
 );

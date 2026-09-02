@@ -1,7 +1,7 @@
 import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import { FormularioNuevaContrasena } from "../components/FormularioNuevaContrasena";
-import { useSplitEntrance } from "../hooks/useSplitEntrance";
+import { useSplitEntrance } from "../animaciones/useSplitEntrance";
 
 const estiloTitulo = {
   fontFamily: "Fraunces, Georgia, serif",
