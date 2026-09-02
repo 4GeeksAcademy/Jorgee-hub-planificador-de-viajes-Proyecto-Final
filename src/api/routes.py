@@ -5,6 +5,7 @@ from flask import Flask, request, jsonify, url_for, Blueprint
 from api.models import db, User, Trip, Destination, Activity, Place, Favorite
 from api.utils import generate_sitemap, APIException
 from api.overpass import OverpassError, buscar_lugares, validar_coordenada
+from api.nominatim import NominatimError, buscar_direccion
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (create_access_token, JWTManager, jwt_required, get_jwt_identity)
@@ -33,6 +34,20 @@ def get_explorar_lugares():
         return jsonify({"msg": str(error)}), error.status_code
 
     return jsonify({"places": lugares}), 200
+
+
+@api.route('/explorar/direccion', methods=['GET'])
+def get_explorar_direccion():
+    try:
+        latitud = validar_coordenada(request.args.get("lat"), -90, 90, "lat")
+        longitud = validar_coordenada(request.args.get("lon"), -180, 180, "lon")
+        direccion = buscar_direccion(round(latitud, 6), round(longitud, 6))
+    except ValueError as error:
+        return jsonify({"msg": str(error)}), 400
+    except NominatimError as error:
+        return jsonify({"msg": str(error)}), error.status_code
+
+    return jsonify(direccion), 200
 
 
 @api.route('/signup', methods=['POST'])
