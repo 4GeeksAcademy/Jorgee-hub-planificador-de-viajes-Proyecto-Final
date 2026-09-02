@@ -42,109 +42,22 @@ body {
 	min-height: 100vh;
 }
 
-.object-fit-cover {
-	object-fit: cover;
-}
-
 .py-lg-6 {
 	padding-top: 6rem !important;
 	padding-bottom: 6rem !important;
 }
 
 @media (max-width: 991.98px) {
-	.navbar-menu-abierto {
-		transform: none !important;
-		opacity: 1 !important;
-	}
-
-	.navbar-toggler {
-		position: relative;
-		z-index: 1024;
-		width: 3rem;
-		height: 3rem;
-		padding: 0;
-		border: 0;
-		border-radius: 0;
-	}
-
 	.navbar-toggler:focus {
 		box-shadow: 0 0 0 0.2rem rgba(140, 227, 237, 0.35);
 	}
 
-	.navegacion-movil-fondo {
-		position: fixed;
-		inset: 0;
-		z-index: 1021;
-		width: 100%;
-		padding: 0;
-		background: rgba(18, 52, 59, 0.55);
-		border: 0;
-	}
-
-	.navegacion-movil-cerrar {
-		display: grid;
-		place-items: center;
-		width: 3rem;
-		height: 3rem;
-		margin-left: auto;
-		padding: 0;
-		background: transparent;
-		border: 0;
-		border-radius: 0;
-		color: #EAF7FA;
-	}
-
-	.navegacion-movil-cerrar:focus-visible {
-		outline: none;
-		box-shadow: 0 0 0 0.2rem rgba(140, 227, 237, 0.35);
-	}
-
-	.navegacion-movil-panel {
-		--bs-offcanvas-width: min(15rem, 70vw);
-		background-color: #12343B;
-		box-shadow: -0.75rem 0 2rem rgba(18, 52, 59, 0.22);
-	}
-
-	.navegacion-movil-panel .navegacion-movil-cerrar {
-		margin-bottom: 0.75rem;
-	}
-
-	.navegacion-movil-panel .navbar-nav {
-		align-items: stretch !important;
-		gap: 0 !important;
-	}
-
-	.navegacion-movil-panel .nav-item {
-		border-top: 1px solid rgba(212, 240, 245, 0.18);
-	}
-
-	.navegacion-movil-panel .nav-link,
-	.navegacion-movil-panel .nav-item > .btn {
-		width: 100%;
-		padding: 1rem 0.25rem;
-		font-size: 1rem;
-		text-align: left;
-	}
-
-	.navegacion-movil-panel .navegacion-movil-cerrar i {
-		font-size: 1.35rem;
-	}
-
-	.navegacion-movil-panel .dropdown-menu {
+	.offcanvas .dropdown-menu {
 		position: static !important;
 		width: 100%;
 		margin: 0 0 0.75rem !important;
 	}
-}
 
-@media (min-width: 992px) {
-	.navegacion-movil-cerrar,
-	.navegacion-movil-fondo {
-		display: none;
-	}
-}
-
-@media (max-width: 991.98px) {
 	.py-lg-6 {
 		padding-top: 4rem !important;
 		padding-bottom: 4rem !important;

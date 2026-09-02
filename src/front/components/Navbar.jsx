@@ -55,11 +55,12 @@ export const Navbar = () => {
 	return (
 		<nav
 			ref={navbarRef}
-			className={`navbar navbar-expand-lg py-3 sticky-top${menuAbierto ? " navbar-menu-abierto" : ""}`}
+			className="navbar navbar-expand-lg py-3 sticky-top"
 			style={{
 				backgroundColor: "#12343B",
 				zIndex: 1020,
 				boxShadow: "0 2px 12px rgba(18, 52, 59, 0.18)",
+				...(menuAbierto ? { transform: "none", opacity: 1 } : {}),
 			}}
 		>
 			<div className="container">
@@ -75,50 +76,12 @@ export const Navbar = () => {
 				>
 					Viajero
 				</Link>
-				{!menuAbierto && (
-					<button
-						ref={botonMenuRef}
-						className="navbar-toggler"
-						type="button"
-						aria-controls="mainNavigation"
-						aria-expanded={menuAbierto}
-						aria-label="Abrir navegación"
-						onClick={() => setMenuAbierto(true)}
-					>
-						<i className="fa-solid fa-bars" aria-hidden="true" />
-					</button>
-				)}
-				{menuAbierto && (
-					<button
-						className="navegacion-movil-fondo"
-						type="button"
-						aria-label="Cerrar menú"
-						onClick={cerrarMenu}
-					/>
-				)}
-				<div
-					className={`offcanvas offcanvas-end navegacion-movil-panel${menuAbierto ? " show" : ""}`}
-					id="mainNavigation"
-					aria-labelledby="mainNavigationTitle"
-					aria-hidden={!menuAbierto}
-				>
-					<h2 id="mainNavigationTitle" className="visually-hidden">
-						Navegación principal
-					</h2>
-					<button
-						className="navegacion-movil-cerrar"
-						type="button"
-						aria-label="Cerrar navegación"
-						onClick={cerrarMenu}
-					>
-						<i className="fa-solid fa-xmark" aria-hidden="true" />
-					</button>
-					<ul className="navbar-nav ms-auto align-items-lg-center gap-lg-4">
+				<div className="d-none d-lg-flex flex-grow-1 justify-content-end">
+					<ul className="navbar-nav align-items-center gap-4">
 						<li className="nav-item">
 							<Link
 								to="/explorar"
 								className="nav-link"
-								onClick={cerrarMenu}
 								style={{ color: "#D4F0F5" }}
 							>
 								Explorar
@@ -128,7 +91,6 @@ export const Navbar = () => {
 							<Link
 								to="/trips"
 								className="nav-link"
-								onClick={cerrarMenu}
 								style={{ color: "#D4F0F5" }}
 							>
 								Mis viajes
@@ -137,7 +99,6 @@ export const Navbar = () => {
 						<li className="nav-item">
 							<a
 								className="nav-link"
-								onClick={cerrarMenu}
 								href="#footer"
 								style={{ color: "#D4F0F5" }}
 							>
@@ -147,6 +108,174 @@ export const Navbar = () => {
 						<li className="nav-item dropdown">
 							<button
 								className="btn border-0 p-2 dropdown-toggle"
+								type="button"
+								data-bs-toggle="dropdown"
+								aria-expanded="false"
+								aria-label="Abrir opciones de usuario"
+								style={{ color: "#EAF7FA" }}
+							>
+								<i className="fa-regular fa-user fs-5" aria-hidden="true" />
+							</button>
+							<ul
+								className="dropdown-menu dropdown-menu-end border-0 shadow-sm mt-2 p-2"
+								style={{
+									backgroundColor: "#EAF7FA",
+									"--bs-dropdown-link-hover-bg": "#D4F0F5",
+									"--bs-dropdown-link-hover-color": "#12343B",
+									"--bs-dropdown-link-active-bg": "#12343B",
+									"--bs-dropdown-link-active-color": "#FFFFFF",
+									borderTop: "3px solid #28C3D4",
+									borderRadius: 0,
+									minWidth: "12rem",
+								}}
+							>
+								{sesionActiva ? (
+									<>
+										<li>
+											<Link to="/perfil" className="dropdown-item">
+												Mi Perfil
+											</Link>
+										</li>
+										<li>
+											<button type="button" className="dropdown-item" onClick={manejarCierreSesion}>
+												Cerrar sesión
+											</button>
+										</li>
+									</>
+								) : (
+									<>
+										<li><Link to="/login" className="dropdown-item">Iniciar sesión</Link></li>
+										<li><Link to="/register" className="dropdown-item">Registrarse</Link></li>
+									</>
+								)}
+							</ul>
+						</li>
+					</ul>
+				</div>
+				{!menuAbierto && (
+					<button
+						ref={botonMenuRef}
+						className="navbar-toggler d-lg-none"
+						type="button"
+						aria-controls="mainNavigation"
+						aria-expanded={menuAbierto}
+						aria-label="Abrir navegación"
+						onClick={() => setMenuAbierto(true)}
+						style={{
+							position: "relative",
+							zIndex: 1024,
+							width: "3rem",
+							height: "3rem",
+							padding: 0,
+							border: 0,
+							borderRadius: 0,
+							color: "#EAF7FA",
+						}}
+					>
+						<i className="fa-solid fa-bars" aria-hidden="true" />
+					</button>
+				)}
+				{menuAbierto && (
+					<button
+						type="button"
+						aria-label="Cerrar menú"
+						onClick={cerrarMenu}
+						style={{
+							position: "fixed",
+							inset: 0,
+							zIndex: 1021,
+							width: "100%",
+							padding: 0,
+							background: "rgba(18, 52, 59, 0.55)",
+							border: 0,
+						}}
+					/>
+				)}
+				<div
+					className={`offcanvas offcanvas-end d-lg-none${menuAbierto ? " show" : ""}`}
+					id="mainNavigation"
+					aria-labelledby="mainNavigationTitle"
+					aria-hidden={!menuAbierto}
+					style={{
+						"--bs-offcanvas-width": "min(15rem, 70vw)",
+						paddingLeft: "1rem",
+						paddingRight: "1rem",
+						backgroundColor: "#12343B",
+						boxShadow: "-0.75rem 0 2rem rgba(18, 52, 59, 0.22)",
+					}}
+				>
+					<h2 id="mainNavigationTitle" className="visually-hidden">
+						Navegación principal
+					</h2>
+					<button
+						type="button"
+						aria-label="Cerrar navegación"
+						onClick={cerrarMenu}
+						style={{
+							display: "grid",
+							placeItems: "center",
+							width: "3rem",
+							height: "3rem",
+							marginLeft: "auto",
+							marginRight: "0.25rem",
+							marginTop: "0.5rem",
+							marginBottom: "0.75rem",
+							padding: 0,
+							background: "transparent",
+							border: 0,
+							borderRadius: 0,
+							color: "#EAF7FA",
+							fontSize: "1.35rem",
+						}}
+					>
+						<i className="fa-solid fa-xmark" aria-hidden="true" />
+					</button>
+					<ul className="navbar-nav w-100 align-items-stretch gap-0">
+						<li
+							className="nav-item"
+							style={{ borderTop: "1px solid rgba(212, 240, 245, 0.18)" }}
+						>
+							<Link
+								to="/explorar"
+								className="nav-link w-100 py-3 px-1 text-start"
+							onClick={cerrarMenu}
+								style={{ color: "#D4F0F5" }}
+							>
+								Explorar
+							</Link>
+						</li>
+						<li
+							className="nav-item"
+							style={{ borderTop: "1px solid rgba(212, 240, 245, 0.18)" }}
+						>
+							<Link
+								to="/trips"
+								className="nav-link w-100 py-3 px-1 text-start"
+							onClick={cerrarMenu}
+								style={{ color: "#D4F0F5" }}
+							>
+								Mis viajes
+							</Link>
+						</li>
+						<li
+							className="nav-item"
+							style={{ borderTop: "1px solid rgba(212, 240, 245, 0.18)" }}
+						>
+							<a
+								className="nav-link w-100 py-3 px-1 text-start"
+								onClick={cerrarMenu}
+								href="#footer"
+								style={{ color: "#D4F0F5" }}
+							>
+								Favoritos
+							</a>
+						</li>
+						<li
+							className="nav-item dropdown"
+							style={{ borderTop: "1px solid rgba(212, 240, 245, 0.18)" }}
+						>
+							<button
+								className="btn border-0 w-100 py-3 px-1 text-start dropdown-toggle"
 								type="button"
 								data-bs-toggle="dropdown"
 								aria-expanded="false"
@@ -172,15 +301,26 @@ export const Navbar = () => {
 								}}
 							>
 								{sesionActiva ? (
-									<li>
-										<button
-											type="button"
-											className="dropdown-item"
-											onClick={manejarCierreSesion}
-										>
-											Cerrar sesión
-										</button>
-									</li>
+									<>
+										<li>
+											<Link
+												to="/perfil"
+												className="dropdown-item"
+												onClick={cerrarMenu}
+											>
+												Mi Perfil
+											</Link>
+										</li>
+										<li>
+											<button
+												type="button"
+												className="dropdown-item"
+												onClick={manejarCierreSesion}
+											>
+												Cerrar sesión
+											</button>
+										</li>
+									</>
 								) : (
 									<>
 										<li>

@@ -14,6 +14,8 @@ import { MisViajes } from "./pages/MisViajes";
 import { RutaProtegida } from "./components/RutaProtegida";
 import { Explorar } from "./pages/Explorar";
 import { Ciudad } from "./pages/Ciudad";
+import { Perfil } from "./pages/Perfil";
+import { ConfiguracionPerfil } from "./pages/ConfiguracionPerfil";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -29,6 +31,9 @@ export const router = createBrowserRouter(
 
       {/* Anidar rutas bajo el validador de sesiones privadas obligatorias */}
       <Route element={<RutaProtegida />}>
+        <Route path="/perfil" element={<Perfil />} />
+        <Route path="/perfil/configuracion" element={<ConfiguracionPerfil />} />
+
         {/* Cargar el formulario para dar de alta nuevas aventuras */}
         <Route path="/trips/new" element={<CrearViaje />} />
 
