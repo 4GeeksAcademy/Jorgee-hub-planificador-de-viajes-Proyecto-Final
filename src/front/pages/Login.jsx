@@ -53,6 +53,7 @@ export const Login = () => {
 			}
 
 			localStorage.setItem("token", datos.token);
+			localStorage.setItem("refresh_token", datos.refresh_token);
 			localStorage.setItem("user", JSON.stringify(datos.user));
 			window.dispatchEvent(new Event("sesion-cambiada"));
 			navigate("/");

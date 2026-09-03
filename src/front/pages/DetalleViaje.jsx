@@ -3,6 +3,7 @@ import { Link, useNavigate, useParams } from "react-router-dom";
 import { ModalConfirmacionEliminacion } from "../components/ModalConfirmacionEliminacion";
 import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 import { formatearFechaViaje, validarFechasViaje } from "../utils/viajes.mjs";
+import { fetchConSesion } from "../utils/sesion.mjs";
 import React from "react";
 
 const estiloTitulo = {
@@ -18,7 +19,7 @@ const estiloInput = {
 };
 
 export const DetalleViaje = () => {
-	const { id } = useParams();
+	const { tripId: id } = useParams();
 	const navigate = useNavigate();
 	const [viaje, setViaje] = useState(null);
 	const [formulario, setFormulario] = useState(null);
@@ -38,7 +39,7 @@ export const DetalleViaje = () => {
 			}
 
 			try {
-				const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
+				const respuesta = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
 					headers: { Authorization: `Bearer ${token}` },
 				});
 				const datos = await respuesta.json();
@@ -77,7 +78,7 @@ export const DetalleViaje = () => {
 
 		setGuardando(true);
 		try {
-			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
+			const respuesta = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
 				method: "PUT",
 				headers: {
 					"Content-Type": "application/json",
@@ -109,7 +110,7 @@ export const DetalleViaje = () => {
 		setError("");
 		setGuardando(true);
 		try {
-			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
+			const respuesta = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/trips/${id}`, {
 				method: "DELETE",
 				headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
 			});
@@ -170,11 +171,11 @@ export const DetalleViaje = () => {
 									</h1>
 								</div>
 								<Link
-									to={`/trips/${id}/destinos`}
+									to={`/trips/${id}/planificar`}
 									className="btn px-4 py-3"
-									style={{ backgroundColor: "#28C3D4", color: "#FFFFFF", fontWeight: "bold", borderRadius: 0 }}
+									style={{ backgroundColor: "#28C3D4", color: "#12343B", fontWeight: "bold", borderRadius: 0 }}
 								>
-									🌍 Gestionar Destinos
+									<i className="fa-solid fa-route me-2" aria-hidden="true" />Abrir planificador
 								</Link>
 							</div>
 						</section>

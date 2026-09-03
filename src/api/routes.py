@@ -8,8 +8,8 @@ from api.overpass import OverpassError, buscar_lugares, validar_coordenada
 from api.nominatim import NominatimError, buscar_direccion
 from flask_cors import CORS
 from werkzeug.security import generate_password_hash, check_password_hash
-from flask_jwt_extended import (create_access_token, JWTManager, jwt_required, get_jwt_identity)
-from datetime import date
+from flask_jwt_extended import (create_access_token, create_refresh_token, JWTManager, jwt_required, get_jwt_identity)
+from datetime import date, time as datetime_time
 from sqlalchemy import or_
 api = Blueprint('api', __name__)
 
@@ -96,10 +96,12 @@ def login():
         return jsonify({"msg": "El usuario o la contraseña son incorrectos"}), 401
 
     access_token = create_access_token(identity=str(existing_user.id))
+    refresh_token = create_refresh_token(identity=str(existing_user.id))
 
     return jsonify({
         "msg": "Inicio de sesión exitoso",
         "token": access_token,
+        "refresh_token": refresh_token,
         "user": {
             "id": existing_user.id,
             "username": existing_user.username,
@@ -108,6 +110,13 @@ def login():
     }), 200
 
     
+@api.route('/refresh', methods=['POST'])
+@jwt_required(refresh=True)
+def refresh():
+    current_user_id = get_jwt_identity()
+    return jsonify({"token": create_access_token(identity=str(current_user_id))}), 200
+
+
 @api.route('/private', methods=['GET'])
 @jwt_required()
 def private():
@@ -300,8 +309,15 @@ def create_activity(destination_id):
     new_activity = Activity(
         name=data["name"],
         date=date.fromisoformat(data["date"]) if data.get("date") else None,
-        time=data.get("time"),
+        time=datetime_time.fromisoformat(data["time"]) if data.get("time") else None,
         notes=data.get("notes"),
+        place_ref=data.get("place_id"),
+        place_category=data.get("place_category"),
+        place_address=data.get("place_address"),
+        place_city=data.get("place_city"),
+        place_source=data.get("place_source"),
+        place_latitude=data.get("place_latitude"),
+        place_longitude=data.get("place_longitude"),
         destination_id=destination_id
     )   
     db.session.add(new_activity)
@@ -333,8 +349,16 @@ def update_activity(activity_id):
         return jsonify({"error": "No tienes permisos sobre esta actividad"}), 403
     activity.name = data.get("name", activity.name)
     activity.date = date.fromisoformat(data["date"]) if data.get("date") else activity.date
-    activity.time = data.get("time", activity.time)
+    if "time" in data:
+        activity.time = datetime_time.fromisoformat(data["time"]) if data["time"] else None
     activity.notes = data.get("notes", activity.notes)
+    activity.place_ref = data.get("place_id", activity.place_ref)
+    activity.place_category = data.get("place_category", activity.place_category)
+    activity.place_address = data.get("place_address", activity.place_address)
+    activity.place_city = data.get("place_city", activity.place_city)
+    activity.place_source = data.get("place_source", activity.place_source)
+    activity.place_latitude = data.get("place_latitude", activity.place_latitude)
+    activity.place_longitude = data.get("place_longitude", activity.place_longitude)
     
     db.session.commit()
     return jsonify(activity.serialize()), 200

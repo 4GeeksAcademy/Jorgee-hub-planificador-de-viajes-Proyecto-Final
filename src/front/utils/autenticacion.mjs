@@ -1,5 +1,6 @@
 export const cerrarSesion = (almacenamiento) => {
 	almacenamiento.removeItem("token");
+	almacenamiento.removeItem("refresh_token");
 	almacenamiento.removeItem("user");
 };
 

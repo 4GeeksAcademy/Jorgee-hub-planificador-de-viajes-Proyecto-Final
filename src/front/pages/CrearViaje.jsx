@@ -6,6 +6,7 @@ import {
 	validarFechaInicioViaje,
 } from "../utils/viajes.mjs";
 import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
+import { fetchConSesion } from "../utils/sesion.mjs";
 
 const estiloTitulo = {
 	fontFamily: "Fraunces, Georgia, serif",
@@ -66,7 +67,7 @@ export const CrearViaje = () => {
 		setCargando(true);
 
 		try {
-			const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips`, {
+			const respuesta = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/trips`, {
 				method: "POST",
 				headers: {
 					"Content-Type": "application/json",
@@ -85,10 +86,10 @@ export const CrearViaje = () => {
 
 			// Evaluar la respuesta del backend para capturar el ID del viaje
 			if (datos.id || (datos.trip && datos.trip.id)) {
-				const viajeId = datos.id || datos.trip.id;
+				const viajeId = datos.id || datos.trip?.id;
 				// Redirigir dinámicamente a la vista detallada del viaje creado
 				setTimeout(() => {
-					navigate(`/trips/${viajeId}`);
+					navigate(`/trips/${viajeId}/planificar`);
 				}, 1500);
 			} else {
 				// Respaldo de navegación en caso de que la API no devuelva un ID

@@ -16,6 +16,7 @@ import { Explorar } from "./pages/Explorar";
 import { Ciudad } from "./pages/Ciudad";
 import { Perfil } from "./pages/Perfil";
 import { ConfiguracionPerfil } from "./pages/ConfiguracionPerfil";
+import { PlanificadorViaje } from "./pages/PlanificadorViaje";
 
 export const router = createBrowserRouter(
   createRoutesFromElements(
@@ -39,6 +40,9 @@ export const router = createBrowserRouter(
 
         {/* Desplegar la lista con la totalidad de itinerarios del usuario */}
         <Route path="/trips" element={<MisViajes />} />
+
+        {/* Abrir el workspace para construir el itinerario del viaje */}
+        <Route path="/trips/:tripId/planificar" element={<PlanificadorViaje />} />
 
         {/* Resolver la coincidencia exacta de redirección tras crear el viaje */}
         <Route path="/trips/:tripId" element={<DetalleViaje />} />

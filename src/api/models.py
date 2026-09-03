@@ -1,5 +1,5 @@
 from flask_sqlalchemy import SQLAlchemy
-from sqlalchemy import String, ForeignKey, Date, Time, Text, DateTime, UniqueConstraint, func
+from sqlalchemy import String, ForeignKey, Date, Time, Text, DateTime, Float, UniqueConstraint, func
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 from datetime import date as dt_date, time as dt_time, datetime
 from typing import List
@@ -85,6 +85,14 @@ class Activity(db.Model):
     time: Mapped[dt_time] = mapped_column(Time)
     date: Mapped[dt_date] = mapped_column(Date)
     notes: Mapped[str] = mapped_column(Text)
+    # Snapshot of the provider place selected from the map.
+    place_ref: Mapped[str] = mapped_column(String(160), nullable=True)
+    place_category: Mapped[str] = mapped_column(String(80), nullable=True)
+    place_address: Mapped[str] = mapped_column(String(255), nullable=True)
+    place_city: Mapped[str] = mapped_column(String(120), nullable=True)
+    place_source: Mapped[str] = mapped_column(String(80), nullable=True)
+    place_latitude: Mapped[float] = mapped_column(Float, nullable=True)
+    place_longitude: Mapped[float] = mapped_column(Float, nullable=True)
     destination_id: Mapped[int] = mapped_column(
         ForeignKey("destination.id", ondelete="CASCADE")
     )
@@ -97,7 +105,14 @@ class Activity(db.Model):
             "name": self.name,
             "time": self.time.isoformat() if self.time else None,
             "date": self.date.isoformat() if self.date else None,
-            "notes": self.notes
+            "notes": self.notes,
+            "place_id": self.place_ref,
+            "place_category": self.place_category,
+            "place_address": self.place_address,
+            "place_city": self.place_city,
+            "place_source": self.place_source,
+            "place_latitude": self.place_latitude,
+            "place_longitude": self.place_longitude
         }
 
 
