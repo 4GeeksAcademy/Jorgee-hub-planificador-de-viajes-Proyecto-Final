@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { cerrarSesion, obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
+import { fetchConSesion } from "../utils/sesion.mjs";
 
 const obtenerUsuarioGuardado = () => {
 	try {
@@ -22,8 +23,8 @@ const formatearFecha = (fecha) => {
 const cargarActividad = async (token) => {
 	const encabezados = { Authorization: `Bearer ${token}` };
 	const respuestas = await Promise.allSettled([
-		fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips`, { headers: encabezados }),
-		fetch(`${import.meta.env.VITE_BACKEND_URL}/api/favorites`, { headers: encabezados }),
+		fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/trips`, { headers: encabezados }),
+		fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/favorites`, { headers: encabezados }),
 	]);
 	const actividad = { viajes: [], favoritos: [], error: "" };
 

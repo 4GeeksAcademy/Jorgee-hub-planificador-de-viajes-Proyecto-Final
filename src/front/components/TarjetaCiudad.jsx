@@ -2,6 +2,7 @@
 import PropTypes from "prop-types";
 import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { fetchConSesion } from "../utils/sesion.mjs";
 
 export const TarjetaCiudad = ({ ciudad, seleccionada, onSeleccionar }) => {
 	const [esFavorito, setEsFavorito] = useState(false);
@@ -16,7 +17,7 @@ export const TarjetaCiudad = ({ ciudad, seleccionada, onSeleccionar }) => {
 			if (!placeId || !token) return;
 
 			try {
-				const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/favorites`, {
+				const res = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/favorites`, {
 					headers: {
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${token}`
@@ -53,7 +54,7 @@ export const TarjetaCiudad = ({ ciudad, seleccionada, onSeleccionar }) => {
 		try {
 			if (esFavorito) {
 				// Eliminar favorito
-				const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/favorites/${favoriteId}`, {
+				const res = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/favorites/${favoriteId}`, {
 					method: "DELETE",
 					headers: {
 						"Content-Type": "application/json",
@@ -71,7 +72,7 @@ export const TarjetaCiudad = ({ ciudad, seleccionada, onSeleccionar }) => {
 				}
 			} else {
 				// Agregar favorito
-				const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/places/${placeId}/favorites`, {
+				const res = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/places/${placeId}/favorites`, {
 					method: "POST",
 					headers: {
 						"Content-Type": "application/json",

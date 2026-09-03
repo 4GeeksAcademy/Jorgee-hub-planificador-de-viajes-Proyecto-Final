@@ -1,6 +1,7 @@
 import React from "react";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
+import { fetchConSesion } from "../utils/sesion.mjs";
 
 export const Favoritos = () => {
 	const [favoritos, setFavoritos] = useState([]);
@@ -11,8 +12,7 @@ export const Favoritos = () => {
 	useEffect(() => {
 		const cargarFavoritos = async () => {
 			try {
-				console.log("Token usado:", token);
-				const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/favorites`, {
+				const res = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/favorites`, {
 					headers: { 
 						"Content-Type": "application/json",
 						Authorization: `Bearer ${token}` 
@@ -44,7 +44,7 @@ export const Favoritos = () => {
 		if (!window.confirm("¿Eliminar este favorito?")) return;
 		
 		try {
-			const res = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/favorites/${favoritoId}`, {
+			const res = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/favorites/${favoritoId}`, {
 				method: "DELETE",
 				headers: { 
 					"Content-Type": "application/json",

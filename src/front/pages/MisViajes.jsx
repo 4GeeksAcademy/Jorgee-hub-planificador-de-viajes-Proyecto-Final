@@ -4,6 +4,7 @@ import { DropdownSeleccion } from "../components/DropdownSeleccion";
 import { TarjetaViaje } from "../components/TarjetaViaje";
 import { obtenerMensajeErrorBackend } from "../utils/autenticacion.mjs";
 import { ordenarViajes } from "../utils/viajes.mjs";
+import { fetchConSesion } from "../utils/sesion.mjs";
 
 export const MisViajes = () => {
 	const location = useLocation();
@@ -27,7 +28,7 @@ export const MisViajes = () => {
 			}
 
 			try {
-				const respuesta = await fetch(`${import.meta.env.VITE_BACKEND_URL}/api/trips`, {
+				const respuesta = await fetchConSesion(`${import.meta.env.VITE_BACKEND_URL}/api/trips`, {
 					headers: { Authorization: `Bearer ${token}` },
 				});
 				const datos = await respuesta.json();
