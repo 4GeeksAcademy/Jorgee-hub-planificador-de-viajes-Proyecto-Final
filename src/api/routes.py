@@ -11,6 +11,8 @@ from werkzeug.security import generate_password_hash, check_password_hash
 from flask_jwt_extended import (create_access_token, create_refresh_token, JWTManager, jwt_required, get_jwt_identity)
 from datetime import date, time as datetime_time
 from sqlalchemy import or_
+from api.utils.verification import generar_token_verificacion, verificar_token
+from api.utils.email import enviar_correo_verificacion
 api = Blueprint('api', __name__)
 
 # Allow CORS requests to this API
@@ -55,26 +57,59 @@ def signup():
     data = request.json
     existing_user_email = User.query.filter_by(email=data["email"]).first()
     if existing_user_email:
-        return jsonify({"error": "El email ya está registrado"}), 409
+        return jsonify({"error": "El email ya está registrado, intenta con uno diferente"}), 409
+
     existing_user_name = User.query.filter_by(username=data["username"]).first()
     if existing_user_name:
-        return jsonify({"error": "El nombre de usuario ya está registrado"}), 409
-        
-
+        return jsonify({"error": "El nombre de usuario ya está registrado, intenta con uno diferente"}), 409
+    token = generar_token_verificacion(data["email"])
+    if not token:
+        return jsonify({"error": "Error al generar token de verificación"}), 500
     new_user = User(
         username=data["username"],
         email=data["email"],
         password_hash=generate_password_hash(data["password"]),
-        first_name=data.get("first_name"),
-        last_name=data.get("last_name")
-        
+        first_name=data.get("first_name", ""),
+        last_name=data.get("last_name", ""),
+        is_active=False,          
+        is_verified=False,        
+        verification_token=token   
     )
 
     db.session.add(new_user)
     db.session.commit()
-    return jsonify({"message": "Usuario creado exitosamente"}), 201
+    
+    email_sent = enviar_correo_verificacion(data["email"], token)
+    
+    if email_sent:
+        return jsonify({"message": "Usuario creado exitosamente. Revisa tu correo para verificar tu cuenta.", "email": data["email"]}), 201
+    else:
+        return jsonify({"message": "Usuario creado pero no se pudo enviar el correo de verificación.", "email": data["email"]}), 201
 
-
+@api.route('/verify-email/<token>', methods=['GET'])
+def verify_email(token):
+    from api.utils.verification import verificar_token
+    from datetime import datetime
+    
+    email = verificar_token(token)
+    if not email:
+        return jsonify({"error": "Token inválido o expirado"}), 400
+    user = User.query.filter_by(email=email).first()
+    
+    if not user:
+        return jsonify({"error": "Usuario no encontrado"}), 404
+    
+    if user.is_verified:
+        return jsonify({"message": "El correo ya ha sido verificado."}), 200
+    
+    user.is_verified = True
+    user.is_active = True
+    user.verified_at = datetime.utcnow()
+    user.verification_token = None
+    db.session.commit()
+    
+    return jsonify({"message": "¡Correo verificado exitosamente!"}), 200
+    
 @api.route('/login', methods=['POST'])
 def login():
     data = request.get_json()
@@ -91,6 +126,13 @@ def login():
 
     if not existing_user:
         return jsonify({"msg": "El usuario o la contraseña son incorrectos"}), 404
+    
+    if not existing_user.is_verified:
+        return jsonify({
+        "msg": "⚠️ Verifica tu correo antes de iniciar sesión.",
+        "requires_verification": True,
+        "email": existing_user.email
+    }), 403
 
     if not check_password_hash(existing_user.password_hash, password):
         return jsonify({"msg": "El usuario o la contraseña son incorrectos"}), 401

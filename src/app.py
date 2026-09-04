@@ -13,6 +13,7 @@ from api.routes import api
 from api.admin import setup_admin
 from api.commands import setup_commands
 from flask_jwt_extended import JWTManager
+from flask_mail import Mail  # ⭐ NUEVA IMPORTACIÓN
 
 # from models import Person
 
@@ -23,7 +24,31 @@ app = Flask(__name__)
 CORS(app)
 app.url_map.strict_slashes = False
 
-# database condiguration
+# ============================================================
+# ⭐ CONFIGURACIÓN PARA VERIFICACIÓN DE EMAIL ⭐
+# ============================================================
+app.config['FRONTEND_URL'] = os.getenv('FRONTEND_URL', 'http://localhost:5173')
+
+app.config['MAIL_SERVER'] = os.getenv('MAIL_SERVER', 'smtp.gmail.com')
+app.config['MAIL_PORT'] = int(os.getenv('MAIL_PORT', 587))
+app.config['MAIL_USE_TLS'] = os.getenv('MAIL_USE_TLS', 'True') == 'True'
+app.config['MAIL_USERNAME'] = os.getenv('MAIL_USERNAME')
+app.config['MAIL_PASSWORD'] = os.getenv('MAIL_PASSWORD')
+app.config['MAIL_DEFAULT_SENDER'] = os.getenv('MAIL_DEFAULT_SENDER', 'no-reply@viajero.com')
+
+print(f"📧 FRONTEND_URL: {app.config['FRONTEND_URL']}")
+print(f"📧 MAIL_USERNAME: {app.config['MAIL_USERNAME']}")
+print(f"📧 MAIL_SERVER: {app.config['MAIL_SERVER']}")
+
+# ============================================================
+# ⭐ INICIALIZAR FLASK-MAIL ⭐
+# ============================================================
+mail = Mail(app)
+app.extensions['mail'] = mail  # ⭐ Para usarlo en utils
+
+# ============================================================
+# CONFIGURACIÓN EXISTENTE (database, JWT, etc.)
+# ============================================================
 db_url = os.getenv("DATABASE_URL")
 if db_url is not None:
     app.config['SQLALCHEMY_DATABASE_URI'] = db_url.replace(
@@ -50,15 +75,11 @@ setup_commands(app)
 app.register_blueprint(api, url_prefix='/api')
 
 # Handle/serialize errors like a JSON object
-
-
 @app.errorhandler(APIException)
 def handle_invalid_usage(error):
     return jsonify(error.to_dict()), error.status_code
 
 # generate sitemap with all your endpoints
-
-
 @app.route('/')
 def sitemap():
     if ENV == "development":
@@ -71,11 +92,9 @@ def serve_any_other_file(path):
     if not os.path.isfile(os.path.join(static_file_dir, path)):
         path = 'index.html'
     response = send_from_directory(static_file_dir, path)
-    response.cache_control.max_age = 0  # avoid cache memory
+    response.cache_control.max_age = 0
     return response
 
-
-# this only runs if `$ python src/main.py` is executed
 if __name__ == '__main__':
     PORT = int(os.environ.get('PORT', 3001))
     app.run(host='0.0.0.0', port=PORT, debug=True)
